@@ -1,7 +1,7 @@
 {
   "name": "sqlcartoui",
   "version": "0.0.1",
-  "description": "A Quasar Project",
+  "description": "GIS web client",
   "productName": "cn.pc.sqlcarto.ui",
   "author": "pcwang （麓山老将） <wang_wang_lao@163.com>",
   "type": "module",
