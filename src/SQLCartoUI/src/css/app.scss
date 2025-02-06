@@ -1,1 +1,23 @@
 // app global css in SCSS form
+
+html{
+    width:100% !important;
+    height:100% !important;
+}
+
+body{
+    width:100% !important;
+    height: 100% !important;
+}
+
+#q-app{
+    height: 100%;
+}
+
+// #q-app > .q-layout{
+//     height: 100%;
+// }
+
+// #q-app main{
+//     height:100%;
+// }
