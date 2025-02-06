@@ -15,14 +15,13 @@
         <q-item
           v-for="item in webMaps"
           v-ripple
-          dense
           clickable
           v-close-popup
           :key="item.type"
           @click="switchTo(item)"
         >
           <q-item-section avatar>
-            <q-avatar>
+            <q-avatar size="md">
               <img :src="item.icon" v-if="item.icon.trim() !== ''" />
             </q-avatar>
           </q-item-section>
@@ -34,13 +33,14 @@
 
         <q-separator />
 
-        <q-item dense clickable v-close-popup @click="onShowWebMapSetting">
+        <q-item clickable v-close-popup @click="onShowWebMapSetting">
           <q-item-section avatar>
             <q-avatar
               icon="settings"
               font-size="20px"
               color="primary"
               text-color="white"
+              size="md"
             />
           </q-item-section>
           <q-item-section>
@@ -54,6 +54,27 @@
       v-model="showWebMapApiSetting"
       v-if="showWebMapApiSetting"
     ></DialogWebMapAPISetting>
+
+    <!-- <q-avatar
+      rounded
+      color="primary"
+      text-color="white"
+      icon="layers"
+      font-size="20px"
+    ></q-avatar> -->
+    <q-btn class="absolute q-pa-none q-ma-none" unelevated style="right: 0px; top: 36px">
+      <q-avatar
+        square
+        style="border-radius: 4px"
+        size="xl"
+        font-size="22px"
+        text-color="white"
+        icon="layers"
+        color="primary"
+        @click="console.log('avatar')"
+      >
+      </q-avatar>
+    </q-btn>
   </div>
 </template>
 
@@ -122,7 +143,7 @@ const switchTo = (item) => {
   } else if (item.type === "TIANDITU") {
     switchToTianDiTu();
   } else {
-    webMapControl.value.src = "";
+    webMapControl.value.src = "/webmap/nomap.html";
   }
 };
 
