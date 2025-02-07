@@ -7,8 +7,8 @@
       >
         <div class="text-h7">{{ props.caption }}</div>
         <div>
-          <q-btn dense flat size="sm" icon="minimize" />
-          <q-btn dense flat size="sm" icon="crop_square" />
+          <!-- <q-btn dense flat size="sm" icon="minimize" />
+          <q-btn dense flat size="sm" icon="crop_square" /> -->
           <q-btn dense flat size="sm" icon="close" @click="onDialogCancel" />
         </div>
       </q-card-section>
