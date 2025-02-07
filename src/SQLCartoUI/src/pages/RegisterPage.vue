@@ -19,16 +19,17 @@
         ></InputPassword>
 
         <InputCaptcha v-model="captcha"></InputCaptcha>
-        <div>
+        <div class="row">
+          <div class="col"></div>
           <q-btn dense label="Submit" type="submit" color="primary" no-caps />
           <q-btn
             dense
-            label="Reset"
-            type="reset"
+            label="Cancel"
             color="primary"
             flat
             class="q-ml-sm"
             no-caps
+            @click="onCancel"
           />
         </div>
       </q-form>
@@ -41,12 +42,18 @@ import InputCaptcha from "src/components/form/InputCaptcha.vue";
 import InputPassword from "src/components/form/InputPassword.vue";
 import InputUserName from "src/components/form/InputUserName.vue";
 import { ref } from "vue";
+import { useRouter } from "vue-router";
 const username = ref("wang_wang_lao@163.com");
 const password = ref("@Ww111111");
 const password2 = ref("@Ww111111");
 const captcha = ref("");
+const router = useRouter();
 
 const onRegister = () => {
   console.log("register");
+};
+
+const onCancel = () => {
+  router.replace({ name: "login" });
 };
 </script>
