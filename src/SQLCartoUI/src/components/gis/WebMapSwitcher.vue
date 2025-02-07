@@ -3,7 +3,7 @@
     <q-btn-dropdown
       dense
       color="primary"
-      :label="currentWebMap"
+      :label="currentWebMap.label"
       no-caps
       square
       split
@@ -62,7 +62,12 @@
       icon="layers"
       font-size="20px"
     ></q-avatar> -->
-    <q-btn class="absolute q-pa-none q-ma-none" unelevated style="right: 0px; top: 36px">
+    <q-btn
+      class="absolute q-pa-none q-ma-none"
+      unelevated
+      style="right: 0px; top: 36px"
+      v-show="currentWebMap.type !== 'NOMAP'"
+    >
       <q-avatar
         square
         style="border-radius: 4px"
@@ -86,7 +91,12 @@ import DialogWebMapAPISetting from "./DialogWebMapAPISetting.vue";
 
 const appConfig = useAppConfig();
 const $q = useQuasar();
-const currentWebMap = ref("No Web Map");
+const currentWebMap = ref({
+  icon: "",
+  label: "No Web Map",
+  type: "NOMAP",
+  caption: "无背景地图",
+});
 const showWebMapApiSetting = ref(false);
 
 const props = defineProps({
@@ -132,8 +142,8 @@ const webMaps = [
 ];
 
 const switchTo = (item) => {
-  if (currentWebMap.value === item.label) return;
-  currentWebMap.value = item.label;
+  if (currentWebMap.value.type === item.type) return;
+  currentWebMap.value = item;
   if (item.type === "GAODE") {
     switchToGaoDe();
   } else if (item.type === "GOOGLE") {
