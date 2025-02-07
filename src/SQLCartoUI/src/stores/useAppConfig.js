@@ -18,13 +18,18 @@ export const useAppConfig = defineStore('appconfig', {
         key: LocalStorage.getItem('google_key') || '',
       },
     },
+    token: '',
+    username: '',
   }),
 
   getters: {
     getGaoDe: (state) => state.webMapKeys.GaoDe,
     getTianDitu: (state) => state.webMapKeys.TianDiTu,
     getBing: (state) => state.webMapKeys.Bing,
-    getGoogle: (sate) => sate.webMapKeys.Google,
+    getGoogle: (state) => state.webMapKeys.Google,
+    hasLogin: (state) => {
+      state.token.trim() !== '' && state.username.trim() !== ''
+    },
   },
 
   actions: {
@@ -45,6 +50,10 @@ export const useAppConfig = defineStore('appconfig', {
     setGoogle(key) {
       this.webMapKeys.Google.key = key
       LocalStorage.set('google_key', key)
+    },
+    setAccountInformation(username, token) {
+      this.token = token
+      this.username = username
     },
   },
 })
