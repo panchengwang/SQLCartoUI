@@ -1,17 +1,21 @@
 // app global css in SCSS form
 
-html{
-    width:100% !important;
-    height:100% !important;
+html {
+  width: 100% !important;
+  height: 100% !important;
 }
 
-body{
-    width:100% !important;
-    height: 100% !important;
+body {
+  width: 100% !important;
+  height: 100% !important;
 }
 
-#q-app{
-    height: 100%;
+#q-app {
+  height: 100%;
+}
+
+.q-tooltip {
+  font-size: 12px !important;
 }
 
 // #q-app > .q-layout{
