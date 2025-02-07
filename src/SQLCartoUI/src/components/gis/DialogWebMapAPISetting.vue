@@ -47,7 +47,7 @@
 
 <script setup>
 import { useAppConfig } from "src/stores/useAppConfig";
-import ResizeableDialog from "../ResizeableDialog.vue";
+import ResizeableDialog from "src/components/dialog/ResizeableDialog.vue";
 
 const appConfig = useAppConfig();
 
