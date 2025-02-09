@@ -20,6 +20,8 @@ export const useAppConfig = defineStore('appconfig', {
     },
     token: '',
     username: '',
+    masterUrl: LocalStorage.getItem('master_url') || 'http://127.0.0.1/sqlcarto/master/service.php',
+    nodeUrl: LocalStorage.getItem('node_url') || 'http://127.0.0.1/sqlcarto/node/service.php',
   }),
 
   getters: {
@@ -54,6 +56,14 @@ export const useAppConfig = defineStore('appconfig', {
     setAccountInformation(username, token) {
       this.token = token
       this.username = username
+    },
+    setMasterUrl(url) {
+      this.masterUrl = url
+      LocalStorage.setItem('master_url', url)
+    },
+    setNodeUrl(url) {
+      this.nodeUrl = url
+      LocalStorage.setItem('node_url', url)
     },
   },
 })
