@@ -12,11 +12,36 @@
     ]"
   >
     <template v-slot:append>
-      <q-btn color="primary" dense round size="sm" icon="how_to_reg" no-caps>
+      <q-btn
+        color="primary"
+        dense
+        round
+        size="sm"
+        icon="how_to_reg"
+        no-caps
+        @click="onUserCheckExists"
+      >
         <q-tooltip class="bg-accent" anchor="top middle">Check if user exists</q-tooltip>
       </q-btn>
     </template>
   </q-input>
 </template>
 
-<script setup></script>
+<script setup>
+import { useAttrs } from "vue";
+import SQLCartoDatabase from "src/net/SQLCartoDatabase";
+import { useQuasar } from "quasar";
+const $attrs = useAttrs();
+
+const $q = useQuasar();
+const onUserCheckExists = () => {
+  const db = new SQLCartoDatabase();
+  db.userIfAvailable($attrs.modelValue.trim(), (response) => {
+    $q.notify({
+      color: "purple",
+      position: "top",
+      message: response.message,
+    });
+  });
+};
+</script>
