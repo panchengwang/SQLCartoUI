@@ -8,54 +8,45 @@ class SQLCartoDatabase {
     this.nodeUrl = this.appConfig.$state.nodeUrl
   }
 
-  userIfAvailable(username, callback) {
+  post(requestData, callback) {
     const formData = new FormData()
-    formData.append(
-      'request',
-      JSON.stringify({
+    formData.append('request', JSON.stringify(requestData))
+    axios.post(this.masterUrl, formData).then((response) => {
+      if (callback) {
+        callback(response.data)
+      }
+    })
+  }
+  userIfAvailable(username, callback) {
+    this.post(
+      {
         type: 'USER_IF_AVAILABLE',
         data: {
           username: username,
         },
-      }),
+      },
+      callback,
     )
-    axios.post(this.masterUrl, formData).then((response) => {
-      if (callback) {
-        callback(response.data)
-      }
-    })
   }
   userGetCaptcha(username, callback) {
-    const formData = new FormData()
-    formData.append(
-      'request',
-      JSON.stringify({
+    this.post(
+      {
         type: 'USER_GET_CAPTCHA',
         data: {
           username: username,
         },
-      }),
+      },
+      callback,
     )
-    axios.post(this.masterUrl, formData).then((response) => {
-      if (callback) {
-        callback(response.data)
-      }
-    })
   }
   userRegister(userinfo, callback) {
-    const formData = new FormData()
-    formData.append(
-      'request',
-      JSON.stringify({
+    this.post(
+      {
         type: 'USER_REGISTER',
         data: userinfo,
-      }),
+      },
+      callback,
     )
-    axios.post(this.masterUrl, formData).then((response) => {
-      if (callback) {
-        callback(response.data)
-      }
-    })
   }
 }
 
