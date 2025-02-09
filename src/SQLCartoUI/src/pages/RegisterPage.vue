@@ -18,10 +18,10 @@
           ]"
         ></InputPassword>
 
-        <InputCaptcha v-model="captcha"></InputCaptcha>
+        <InputCaptcha v-model="captcha" :username="username"></InputCaptcha>
         <div class="row">
           <div class="col"></div>
-          <q-btn dense label="Submit" type="submit" color="primary" no-caps />
+          <q-btn dense label="Register" type="submit" color="primary" no-caps />
           <q-btn
             dense
             label="Cancel"
