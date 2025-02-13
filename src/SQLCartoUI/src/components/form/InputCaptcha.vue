@@ -57,7 +57,7 @@ const onGetCaptcha = () => {
   const db = new SQLCartoDatabase({});
   db.userGetCaptcha(username.value, (response) => {
     $q.notify({
-      color: "purple",
+      type: response.success ? "positive" : "negative",
       position: "top",
       message: response.message,
     });
