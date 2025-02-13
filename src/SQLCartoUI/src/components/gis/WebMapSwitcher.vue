@@ -85,7 +85,7 @@
 
 <script setup>
 import { useQuasar } from "quasar";
-import { useAppConfig } from "src/stores/useAppConfig";
+import { useAppConfig } from "src/stores/ApplicationConfiguration";
 import { ref, toRefs } from "vue";
 import DialogWebMapAPISetting from "./DialogWebMapAPISetting.vue";
 

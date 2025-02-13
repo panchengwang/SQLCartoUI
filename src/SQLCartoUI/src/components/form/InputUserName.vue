@@ -38,7 +38,7 @@ const onUserCheckExists = () => {
   const db = new SQLCartoDatabase();
   db.userIfAvailable($attrs.modelValue.trim(), (response) => {
     $q.notify({
-      color: "purple",
+      type: response.success ? "positive" : "negative",
       position: "top",
       message: response.message,
     });

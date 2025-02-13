@@ -28,6 +28,7 @@
 
         <q-card-actions align="right">
           <q-btn flat no-caps @click="onRegister">Register</q-btn>
+          <q-btn flat no-caps @click="onResetPassword">Forget Password?</q-btn>
           <div style="flex-grow: 1"></div>
           <q-btn flat no-caps @click="onLogin">Sign In</q-btn>
         </q-card-actions>
@@ -39,7 +40,7 @@
 <script setup>
 import InputPassword from "src/components/form/InputPassword.vue";
 
-import { useAppConfig } from "src/stores/useAppConfig";
+import { useAppConfig } from "src/stores/ApplicationConfiguration";
 import { useRouter } from "vue-router";
 
 const appConfig = useAppConfig();
@@ -51,7 +52,19 @@ const onLogin = () => {
 };
 
 const onRegister = () => {
-  router.replace({ name: "register" });
+  router.replace({
+    name: "register_or_reset_password",
+    params: {
+      type: "register",
+    },
+  });
+};
+
+const onResetPassword = () => {
+  router.replace({
+    name: "register_or_reset_password",
+    params: { type: "reset_password" },
+  });
 };
 </script>
 

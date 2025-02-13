@@ -1,4 +1,4 @@
-import { useAppConfig } from 'src/stores/useAppConfig'
+import { useAppConfig } from 'src/stores/ApplicationConfiguration'
 import axios from 'axios'
 
 class SQLCartoDatabase {
@@ -43,6 +43,15 @@ class SQLCartoDatabase {
     this.post(
       {
         type: 'USER_REGISTER',
+        data: userinfo,
+      },
+      callback,
+    )
+  }
+  userResetPassword(userinfo, callback) {
+    this.post(
+      {
+        type: 'USER_RESET_PASSWORD',
         data: userinfo,
       },
       callback,

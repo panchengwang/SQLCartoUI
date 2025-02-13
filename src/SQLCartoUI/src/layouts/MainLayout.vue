@@ -95,7 +95,7 @@
 </template>
 
 <script setup>
-import { useAppConfig } from "src/stores/useAppConfig";
+import { useAppConfig } from "src/stores/ApplicationConfiguration";
 import { onMounted } from "vue";
 import { useRouter } from "vue-router";
 

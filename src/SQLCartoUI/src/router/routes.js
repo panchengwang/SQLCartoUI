@@ -11,9 +11,15 @@ const routes = [
       { path: '', name: 'application', component: () => import('pages/ApplicationPage.vue') },
 
       {
+        path: '/:type',
+        name: 'register_or_reset_password',
+        props: true,
+        component: () => import('pages/RegisterOrResetPasswordPage.vue'),
+      },
+      {
         path: '',
-        name: 'register',
-        component: () => import('pages/RegisterPage.vue'),
+        name: 'reset_password',
+        component: () => import('pages/ResetPasswordPage.vue'),
       },
     ],
   },
