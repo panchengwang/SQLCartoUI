@@ -1,27 +1,27 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
-import { LocalStorage } from 'quasar'
+import SQLCartoDatabase from 'src/net/SQLCartoDatabase'
 
 export const useAppConfig = defineStore('appconfig', {
   state: () => ({
     webMapKeys: {
       GaoDe: {
-        key: LocalStorage.getItem('gaode_key') || '',
-        password: LocalStorage.getItem('gaode_password') || '',
+        key: '',
+        password: '',
       },
       TianDiTu: {
-        key: LocalStorage.getItem('tianditu_key') || '',
+        key: '',
       },
       Bing: {
-        key: LocalStorage.getItem('bing_key') || '',
+        key: '',
       },
       Google: {
-        key: LocalStorage.getItem('google_key') || '',
+        key: '',
       },
     },
     token: '',
     username: '',
-    masterUrl: LocalStorage.getItem('master_url') || 'http://127.0.0.1/sqlcarto/master/service.php',
-    nodeUrl: LocalStorage.getItem('node_url') || 'http://127.0.0.1/sqlcarto/node/service.php',
+    masterUrl: 'http://127.0.0.1/sqlcarto/master/service.php',
+    nodeUrl: '',
   }),
 
   getters: {
@@ -38,20 +38,15 @@ export const useAppConfig = defineStore('appconfig', {
     setGaoDe(key, password) {
       this.webMapKeys.GaoDe.key = key
       this.webMapKeys.GaoDe.password = password
-      LocalStorage.set('gaode_key', key)
-      LocalStorage.set('gaode_password', password)
     },
     setTianDiTu(key) {
       this.webMapKeys.TianDiTu.key = key
-      LocalStorage.set('tianditu_key', key)
     },
     setBing(key) {
       this.webMapKeys.Bing.key = key
-      LocalStorage.set('bing_key', key)
     },
     setGoogle(key) {
       this.webMapKeys.Google.key = key
-      LocalStorage.set('google_key', key)
     },
     setAccountInformation(username, token) {
       this.token = token
@@ -59,11 +54,26 @@ export const useAppConfig = defineStore('appconfig', {
     },
     setMasterUrl(url) {
       this.masterUrl = url
-      LocalStorage.setItem('master_url', url)
     },
     setNodeUrl(url) {
       this.nodeUrl = url
-      LocalStorage.setItem('node_url', url)
+    },
+    loadWebMapKeys() {
+      const db = new SQLCartoDatabase()
+      db.userLoadWebMapKeys(
+        {
+          token: this.token,
+          username: this.username,
+        },
+        (response) => {
+          const webmapkeys = response.data.webmapkeys
+          this.webMapKeys.GaoDe.key = webmapkeys.gaode_key
+          this.webMapKeys.GaoDe.password = webmapkeys.gaode_password
+          this.webMapKeys.Bing.key = webmapkeys.bing_key
+          this.webMapKeys.TianDiTu.key = webmapkeys.tianditu_key
+          this.webMapKeys.Google.key = webmapkeys.google_key
+        },
+      )
     },
   },
 })
