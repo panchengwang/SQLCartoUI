@@ -38,17 +38,39 @@
 </template>
 
 <script setup>
+import { ref } from "vue";
 import InputPassword from "src/components/form/InputPassword.vue";
-
-import { useAppConfig } from "src/stores/ApplicationConfiguration";
+// import { useAppConfig } from "src/stores/ApplicationConfiguration";
 import { useRouter } from "vue-router";
+import SQLCartoDatabase from "src/net/SQLCartoDatabase";
+import { useQuasar } from "quasar";
 
-const appConfig = useAppConfig();
+const $q = useQuasar();
+// const appConfig = useAppConfig();
 const router = useRouter();
-
+const username = ref("wang_wang_lao@163.com");
+const password = ref("@Ww111111");
 const onLogin = () => {
-  appConfig.setAccountInformation("pcwang", "sdfasdfs");
-  router.replace({ name: "application" });
+  const db = new SQLCartoDatabase();
+  db.userSignIn(
+    {
+      username: username.value.trim(),
+      password: password.value.trim(),
+    },
+    (response) => {
+      if (response.success) {
+        router.replace({ name: "application" });
+      } else {
+        $q.notify({
+          message: response.message,
+          type: "negative",
+          position: "top",
+        });
+      }
+    }
+  );
+  // appConfig.setAccountInformation("pcwang", "sdfasdfs");
+  // router.replace({ name: "application" });
 };
 
 const onRegister = () => {
