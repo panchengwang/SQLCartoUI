@@ -57,6 +57,16 @@ class SQLCartoDatabase {
       callback,
     )
   }
+
+  userSignIn(userinfo, callback) {
+    this.post(
+      {
+        type: 'USER_SIGN_IN',
+        data: userinfo,
+      },
+      callback,
+    )
+  }
 }
 
 export default SQLCartoDatabase
