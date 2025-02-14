@@ -6,7 +6,6 @@
       :label="currentWebMap.label"
       no-caps
       square
-      split
       class="full-width"
       unelevated
       stretch
@@ -160,8 +159,9 @@ const switchTo = (item) => {
 const switchToGaoDe = () => {
   if (appConfig.getGaoDe.key.trim() === "" || appConfig.getGaoDe.password.trim() === "") {
     $q.notify({
+      position: "top",
+      type: "negative",
       message: "Please set key and password of gaode web map.",
-      color: "purple",
     });
     return;
   }
@@ -171,8 +171,9 @@ const switchToGaoDe = () => {
 const switchToGoogle = () => {
   if (appConfig.getGoogle.key.trim() === "") {
     $q.notify({
+      position: "top",
+      type: "negative",
       message: "Please set key and password of google web map.",
-      color: "purple",
     });
     return;
   }
@@ -182,8 +183,9 @@ const switchToGoogle = () => {
 const switchToBing = () => {
   if (appConfig.getBing.key.trim() === "") {
     $q.notify({
+      position: "top",
+      type: "negative",
       message: "Please set key and password of Bing web map.",
-      color: "purple",
     });
     return;
   }
@@ -193,8 +195,9 @@ const switchToBing = () => {
 const switchToTianDiTu = () => {
   if (appConfig.getBing.key.trim() === "") {
     $q.notify({
+      position: "top",
+      type: "negative",
       message: "Please set key and password of TianDiTu web map.",
-      color: "purple",
     });
     return;
   }
