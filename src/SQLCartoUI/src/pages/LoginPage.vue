@@ -63,6 +63,7 @@ const onLogin = () => {
         appConfig.$state.token = response.data.token;
         appConfig.$state.username = username.value.trim();
         router.replace({ name: "application" });
+        appConfig.loadWebMapKeys();
       } else {
         $q.notify({
           message: response.message,
