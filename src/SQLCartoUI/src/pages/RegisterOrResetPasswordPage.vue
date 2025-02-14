@@ -90,7 +90,7 @@ const onRegister = () => {
     db.userResetPassword(
       {
         username: username.value.trim(),
-        pasword: password.value.trim(),
+        password: password.value.trim(),
         captcha: captcha.value.trim(),
       },
       (response) => {
