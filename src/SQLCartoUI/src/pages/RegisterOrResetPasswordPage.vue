@@ -72,7 +72,7 @@ const onRegister = () => {
     db.userRegister(
       {
         username: username.value.trim(),
-        pasword: password.value.trim(),
+        password: password.value.trim(),
         captcha: captcha.value.trim(),
       },
       (response) => {
@@ -81,6 +81,9 @@ const onRegister = () => {
           position: "top",
           type: response.success ? "positive" : "negative",
         });
+        if (response.success) {
+          router.replace({ name: "login" });
+        }
       }
     );
   } else if (type.value === "reset_password") {
