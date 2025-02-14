@@ -8,7 +8,7 @@ class SQLCartoDatabase {
     this.nodeUrl = this.appConfig.$state.nodeUrl
   }
 
-  post(requestData, callback) {
+  postToMaster(requestData, callback) {
     const formData = new FormData()
     formData.append('request', JSON.stringify(requestData))
     axios.post(this.masterUrl, formData).then((response) => {
@@ -17,8 +17,19 @@ class SQLCartoDatabase {
       }
     })
   }
+
+  postToNode(requestData, callback) {
+    const formData = new FormData()
+    formData.append('request', JSON.stringify(requestData))
+    axios.post(this.nodeUrl, formData).then((response) => {
+      if (callback) {
+        callback(response.data)
+      }
+    })
+  }
+
   userIfAvailable(username, callback) {
-    this.post(
+    this.postToMaster(
       {
         type: 'USER_IF_AVAILABLE',
         data: {
@@ -29,7 +40,7 @@ class SQLCartoDatabase {
     )
   }
   userGetCaptcha(username, callback) {
-    this.post(
+    this.postToMaster(
       {
         type: 'USER_GET_CAPTCHA',
         data: {
@@ -40,7 +51,7 @@ class SQLCartoDatabase {
     )
   }
   userRegister(userinfo, callback) {
-    this.post(
+    this.postToMaster(
       {
         type: 'USER_REGISTER',
         data: userinfo,
@@ -49,7 +60,7 @@ class SQLCartoDatabase {
     )
   }
   userResetPassword(userinfo, callback) {
-    this.post(
+    this.postToMaster(
       {
         type: 'USER_RESET_PASSWORD',
         data: userinfo,
@@ -59,9 +70,19 @@ class SQLCartoDatabase {
   }
 
   userSignIn(userinfo, callback) {
-    this.post(
+    this.postToMaster(
       {
         type: 'USER_SIGN_IN',
+        data: userinfo,
+      },
+      callback,
+    )
+  }
+
+  userLoadWebMapKeys(userinfo, callback) {
+    this.postToNode(
+      {
+        type: 'USER_LOAD_WEB_MAP_KEYS',
         data: userinfo,
       },
       callback,
