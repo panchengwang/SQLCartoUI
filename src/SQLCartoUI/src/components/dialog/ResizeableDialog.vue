@@ -16,8 +16,18 @@
         <slot name="content"></slot>
       </q-card-section>
       <q-card-actions align="right">
-        <q-btn size="md" color="primary" label="OK" @click="onOKClick" icon="check" />
         <q-btn
+          no-caps
+          size="md"
+          dense
+          color="primary"
+          label="OK"
+          @click="onOKClick"
+          icon="check"
+        />
+        <q-btn
+          no-caps
+          dense
           size="md"
           color="primary"
           label="Cancel"
