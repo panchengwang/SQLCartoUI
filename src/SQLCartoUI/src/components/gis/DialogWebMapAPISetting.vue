@@ -8,14 +8,14 @@
           outlined
           dense
           label="key"
-          v-model="appConfig.getGaoDe.key"
+          v-model="appConfig.$state.webMapKeys.GaoDe.key"
           :rules="[true]"
         ></InputPassword>
         <InputPassword
           outlined
           dense
           label="password"
-          v-model="appConfig.getGaoDe.password"
+          v-model="appConfig.$state.webMapKeys.GaoDe.password"
           :rules="[true]"
         ></InputPassword>
         <label>Google:</label>
@@ -24,7 +24,7 @@
           outlined
           dense
           label="key"
-          v-model="appConfig.getGoogle.key"
+          v-model="appConfig.$state.webMapKeys.Google.key"
           :rules="[true]"
         ></InputPassword>
         <label>Bing:</label>
@@ -33,7 +33,7 @@
           outlined
           dense
           label="key"
-          v-model="appConfig.getBing.key"
+          v-model="appConfig.$state.webMapKeys.Bing.key"
           :rules="[true]"
         ></InputPassword>
         <label>TianDiTu:</label>
@@ -42,7 +42,7 @@
           outlined
           dense
           label="key"
-          v-model="appConfig.getTianDitu.key"
+          v-model="appConfig.$state.webMapKeys.TianDiTu.key"
           :rules="[true]"
         ></InputPassword>
       </q-form>
@@ -57,9 +57,6 @@ import InputPassword from "../form/InputPassword.vue";
 const appConfig = useAppConfig();
 
 const onAccept = () => {
-  appConfig.setGaoDe(appConfig.getGaoDe.key, appConfig.getGaoDe.password);
-  appConfig.setBing(appConfig.getBing.key);
-  appConfig.setGoogle(appConfig.getGoogle.key);
-  appConfig.setTianDiTu(appConfig.getTianDitu.key);
+  console.log(appConfig.$state.webMapKeys);
 };
 </script>
