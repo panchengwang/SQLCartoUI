@@ -40,13 +40,13 @@
 <script setup>
 import { ref } from "vue";
 import InputPassword from "src/components/form/InputPassword.vue";
-// import { useAppConfig } from "src/stores/ApplicationConfiguration";
+import { useAppConfig } from "src/stores/ApplicationConfiguration";
 import { useRouter } from "vue-router";
 import SQLCartoDatabase from "src/net/SQLCartoDatabase";
 import { useQuasar } from "quasar";
 
 const $q = useQuasar();
-// const appConfig = useAppConfig();
+const appConfig = useAppConfig();
 const router = useRouter();
 const username = ref("wang_wang_lao@163.com");
 const password = ref("@Ww111111");
@@ -59,6 +59,9 @@ const onLogin = () => {
     },
     (response) => {
       if (response.success) {
+        appConfig.$state.nodeUrl = response.data.node_url;
+        appConfig.$state.token = response.data.token;
+        appConfig.$state.username = username.value.trim();
         router.replace({ name: "application" });
       } else {
         $q.notify({
