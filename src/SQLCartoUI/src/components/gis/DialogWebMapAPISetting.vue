@@ -3,43 +3,48 @@
     <template v-slot:content>
       <q-form class="full-width q-pt-md q-gutter-sm">
         <label>GaoDe:</label>
-        <q-input
+        <InputPassword
           class="q-pa-none"
           outlined
           dense
           label="key"
           v-model="appConfig.getGaoDe.key"
-        ></q-input>
-        <q-input
+          :rules="[true]"
+        ></InputPassword>
+        <InputPassword
           outlined
           dense
           label="password"
           v-model="appConfig.getGaoDe.password"
-        ></q-input>
+          :rules="[true]"
+        ></InputPassword>
         <label>Google:</label>
-        <q-input
+        <InputPassword
           class="q-pa-none"
           outlined
           dense
           label="key"
           v-model="appConfig.getGoogle.key"
-        ></q-input>
+          :rules="[true]"
+        ></InputPassword>
         <label>Bing:</label>
-        <q-input
+        <InputPassword
           class="q-pa-none"
           outlined
           dense
           label="key"
           v-model="appConfig.getBing.key"
-        ></q-input>
+          :rules="[true]"
+        ></InputPassword>
         <label>TianDiTu:</label>
-        <q-input
+        <InputPassword
           class="q-pa-none"
           outlined
           dense
           label="key"
           v-model="appConfig.getTianDitu.key"
-        ></q-input>
+          :rules="[true]"
+        ></InputPassword>
       </q-form>
     </template>
   </ResizeableDialog>
@@ -48,7 +53,7 @@
 <script setup>
 import { useAppConfig } from "src/stores/ApplicationConfiguration";
 import ResizeableDialog from "src/components/dialog/ResizeableDialog.vue";
-
+import InputPassword from "../form/InputPassword.vue";
 const appConfig = useAppConfig();
 
 const onAccept = () => {
