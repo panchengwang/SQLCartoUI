@@ -88,6 +88,16 @@ class SQLCartoDatabase {
       callback,
     )
   }
+
+  userSaveWebMapKeys(userinfo, callback) {
+    this.postToNode(
+      {
+        type: 'USER_SAVE_WEB_MAP_KEYS',
+        data: userinfo,
+      },
+      callback,
+    )
+  }
 }
 
 export default SQLCartoDatabase

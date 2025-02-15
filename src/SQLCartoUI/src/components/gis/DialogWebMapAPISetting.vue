@@ -54,9 +54,21 @@
 import { useAppConfig } from "src/stores/ApplicationConfiguration";
 import ResizeableDialog from "src/components/dialog/ResizeableDialog.vue";
 import InputPassword from "../form/InputPassword.vue";
+import SQLCartoDatabase from "src/net/SQLCartoDatabase";
 const appConfig = useAppConfig();
 
 const onAccept = () => {
-  console.log(appConfig.$state.webMapKeys);
+  const db = new SQLCartoDatabase();
+  db.userSaveWebMapKeys({
+    username: appConfig.$state.username,
+    token: appConfig.$state.token,
+    webmapkeys: {
+      gaode_key: appConfig.webMapKeys.GaoDe.key,
+      gaode_password: appConfig.$state.webMapKeys.GaoDe.password,
+      bing_key: appConfig.$state.webMapKeys.Bing.key,
+      google_key: appConfig.$state.webMapKeys.Google.key,
+      tianditu_key: appConfig.$state.webMapKeys.TianDiTu.key,
+    },
+  });
 };
 </script>

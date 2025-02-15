@@ -61,24 +61,67 @@
       icon="layers"
       font-size="20px"
     ></q-avatar> -->
-    <q-btn
-      class="absolute q-pa-none q-ma-none"
+
+    <div
+      class="absolute q-pa-none q-ma-none column no-wrap q-gutter-sm"
       unelevated
-      style="right: 0px; top: 36px"
+      style="right: 0px; top: 40px"
       v-show="currentWebMap.type !== 'NOMAP'"
     >
-      <q-avatar
-        square
-        style="border-radius: 4px"
-        size="xl"
-        font-size="22px"
-        text-color="white"
-        icon="layers"
-        color="primary"
-        @click="console.log('avatar')"
+      <q-btn color="indigo-1" text-color="grey-8" dense>
+        <q-avatar
+          square
+          style="border-radius: 4px"
+          size="xl"
+          font-size="22px"
+          text-color="white"
+          @click="onShowDefaultMap()"
+        >
+          <img src="/icons/default.png" />
+        </q-avatar>
+      </q-btn>
+      <q-btn color="indigo-1" text-color="grey-8" dense>
+        <q-avatar
+          square
+          style="border-radius: 4px"
+          size="xl"
+          font-size="22px"
+          text-color="white"
+          @click="onShowSatelliteMap()"
+        >
+          <img src="/icons/satellite.png" />
+        </q-avatar>
+      </q-btn>
+      <q-btn
+        color="indigo-1"
+        text-color="grey-8"
+        dense
+        :disable="['TIANDITU', 'GOOGLE', 'BING'].indexOf(currentWebMap.type) >= 0"
+        @click="onShowTrafficMap()"
       >
-      </q-avatar>
-    </q-btn>
+        <q-avatar
+          square
+          style="border-radius: 4px"
+          size="xl"
+          font-size="22px"
+          text-color="white"
+          @click="console.log('avatar')"
+        >
+          <img src="/icons/traffic.png" />
+        </q-avatar>
+      </q-btn>
+      <q-btn
+        color="indigo-1"
+        text-color="grey-8"
+        dense
+        stack
+        :icon="labelVisible ? 'check_box' : 'check_box_outline_blank'"
+        label="Labels"
+        no-caps
+        @click="onSwitchLabelVisible()"
+      >
+      </q-btn>
+    </div>
   </div>
 </template>
 
@@ -106,6 +149,8 @@ const props = defineProps({
 });
 
 const { webMapControl } = toRefs(props);
+const labelVisible = ref(true);
+const trafficVisible = ref(false);
 
 const webMaps = [
   {
@@ -143,6 +188,7 @@ const webMaps = [
 const switchTo = (item) => {
   if (currentWebMap.value.type === item.type) return;
   currentWebMap.value = item;
+  labelVisible.value = true;
   if (item.type === "GAODE") {
     switchToGaoDe();
   } else if (item.type === "GOOGLE") {
@@ -206,5 +252,23 @@ const switchToTianDiTu = () => {
 
 const onShowWebMapSetting = () => {
   showWebMapApiSetting.value = true;
+};
+
+const onShowDefaultMap = () => {
+  webMapControl.value.contentWindow.setDefaultMapVisible();
+};
+
+const onShowSatelliteMap = () => {
+  webMapControl.value.contentWindow.setSatelliteMapVisible();
+};
+
+const onSwitchLabelVisible = () => {
+  labelVisible.value = !labelVisible.value;
+  webMapControl.value.contentWindow.setLabelVisible(labelVisible.value);
+};
+
+const onShowTrafficMap = () => {
+  trafficVisible.value = !trafficVisible.value;
+  webMapControl.value.contentWindow.setTrafficMapVisible(trafficVisible.value);
 };
 </script>

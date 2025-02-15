@@ -102,6 +102,34 @@
         }
         return null
       }
+
+      function setLabelVisible(visible) {
+        if (visible) {
+          getLayerByClassName('AMap.Inner.LabelsLayer').show()
+        } else {
+          getLayerByClassName('AMap.Inner.LabelsLayer').hide()
+        }
+      }
+
+      function setDefaultMapVisible() {
+        hideAllLayer()
+        standardLayer.show()
+        setLabelVisible(true)
+      }
+
+      function setSatelliteMapVisible() {
+        hideAllLayer()
+        satelliteLayer.show()
+        setLabelVisible(true)
+      }
+
+      function setTrafficMapVisible(visible) {
+        if (visible) {
+          trafficLayer.show()
+        } else {
+          trafficLayer.hide()
+        }
+      }
     </script>
   </head>
 

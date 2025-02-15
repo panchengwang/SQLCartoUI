@@ -201,6 +201,34 @@
         //     terrainLayer.setVisible(false);
         // }
       }
+
+      function setLabelVisible(visible) {
+        if (visible) {
+          map.set('styles', [
+            {
+              featureType: 'all',
+              elementType: 'labels',
+              stylers: [{ visibility: 'on' }],
+            },
+          ])
+        } else {
+          map.set('styles', [
+            {
+              featureType: 'all',
+              elementType: 'labels',
+              stylers: [{ visibility: 'off' }],
+            },
+          ])
+        }
+      }
+
+      function setDefaultMapVisible() {
+        showLayer('ROADMAP')
+      }
+
+      function setSatelliteMapVisible() {
+        showLayer('SATELLITE')
+      }
     </script>
   </head>
 
