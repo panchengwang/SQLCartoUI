@@ -146,9 +146,21 @@ const props = defineProps({
     type: Object,
     default: null,
   },
+  beforeMapChanged: {
+    type: Function,
+    default: () => {
+      return true;
+    },
+  },
+  getWebMapUrl: {
+    type: Function,
+    default: () => {
+      return "/webmap/nomap.html";
+    },
+  },
 });
 
-const { webMapControl } = toRefs(props);
+const { webMapControl, beforeMapChanged, getWebMapUrl } = toRefs(props);
 const labelVisible = ref(true);
 const trafficVisible = ref(false);
 
@@ -186,6 +198,9 @@ const webMaps = [
 ];
 
 const switchTo = (item) => {
+  if (!beforeMapChanged.value()) {
+    return;
+  }
   if (currentWebMap.value.type === item.type) return;
   currentWebMap.value = item;
   labelVisible.value = true;
@@ -198,7 +213,7 @@ const switchTo = (item) => {
   } else if (item.type === "TIANDITU") {
     switchToTianDiTu();
   } else {
-    webMapControl.value.src = "/webmap/nomap.html";
+    webMapControl.value.src = getWebMapUrl.value();
   }
 };
 
@@ -211,7 +226,7 @@ const switchToGaoDe = () => {
     });
     return;
   }
-  webMapControl.value.src = `/webmap/gaode.html?x=112.957273&y=28.199262&z=14&key=${appConfig.getGaoDe.key}&password=${appConfig.getGaoDe.password}`;
+  webMapControl.value.src = getWebMapUrl.value("GAODE"); // `/webmap/gaode.html?x=112.957273&y=28.199262&z=14&key=${appConfig.getGaoDe.key}&password=${appConfig.getGaoDe.password}`;
 };
 
 const switchToGoogle = () => {
@@ -223,7 +238,7 @@ const switchToGoogle = () => {
     });
     return;
   }
-  webMapControl.value.src = `/webmap/google.html?x=112.957273&y=28.199262&z=14&key=${appConfig.getGoogle.key}`;
+  webMapControl.value.src = getWebMapUrl.value("GOOGLE"); // `/webmap/google.html?x=112.957273&y=28.199262&z=14&key=${appConfig.getGoogle.key}`;
 };
 
 const switchToBing = () => {
@@ -235,7 +250,7 @@ const switchToBing = () => {
     });
     return;
   }
-  webMapControl.value.src = `/webmap/bing.html?x=112.957273&y=28.199262&z=14&key=${appConfig.getBing.key}`;
+  webMapControl.value.src = getWebMapUrl.value("BING"); //`/webmap/bing.html?x=112.957273&y=28.199262&z=14&key=${appConfig.getBing.key}`;
 };
 
 const switchToTianDiTu = () => {
@@ -247,7 +262,7 @@ const switchToTianDiTu = () => {
     });
     return;
   }
-  webMapControl.value.src = `/webmap/tianditu.html?x=112.957273&y=28.199262&z=14&key=${appConfig.getTianDitu.key}`;
+  webMapControl.value.src = getWebMapUrl.value("TIANDITU"); //`/webmap/tianditu.html?x=112.957273&y=28.199262&z=14&key=${appConfig.getTianDitu.key}`;
 };
 
 const onShowWebMapSetting = () => {

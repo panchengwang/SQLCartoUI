@@ -5,37 +5,71 @@
       class="absolute full-width full-height"
       ref="webMapControl"
     ></iframe>
-    <div
-      :id="mapid"
+    <MapCanvas
       class="absolute full-width full-height q-pa-none no-scroll"
+      ref="mapCanvas"
       @contextmenu.prevent="null"
-    ></div>
+      :srid="srid"
+    ></MapCanvas>
     <WebMapSwitcher
       class="absolute"
       style="right: 10px; top: 10px; width: 200px"
+      v-show="srid === 3857 || srid === 900913"
       :webMapControl="webMapControl"
+      :before-map-changed="onBeforeMapChanged"
+      :get-web-map-url="onGetWebMapUrl"
     ></WebMapSwitcher>
   </div>
 </template>
 
 <script setup>
-import { MapCanvas } from "./MapCanvas.js";
-import { useId } from "quasar";
-import { onMounted, ref } from "vue";
+import MapCanvas from "./MapCanvas.vue";
+// import { useId } from "quasar";
+import { onMounted, ref, toRefs } from "vue";
 // import { useAppConfig } from "src/stores/useAppConfig.js";
 import WebMapSwitcher from "./WebMapSwitcher.vue";
+import { useAppConfig } from "src/stores/ApplicationConfiguration";
+import { transform } from "ol/proj";
 
-const mapid = useId();
+// const mapid = useId();
 const mapCanvas = ref(null);
 const webMapControl = ref(null);
-// const appConfig = useAppConfig();
-// const webMapSrc = ref(
-//   "/webmap/gaode.html?x=112.957273&y=28.199262&z=14&key=d27242255dfd0152233a1023c4ea0ecb&password=99be80ec0f86d6dec388057d0133f8e2"
-// );
+const appConfig = useAppConfig();
 
-onMounted(() => {
-  mapCanvas.value = new MapCanvas({
-    el: document.getElementById(mapid.value),
-  });
+const props = defineProps({
+  srid: {
+    type: Number,
+    default: 3857,
+  },
+  center: {
+    type: Array,
+    default: () => transform([112.957273, 28.199262], "EPSG:4326", "EPSG:3857"),
+  },
+  zoom: {
+    type: Number,
+    default: 1,
+  },
 });
+
+const { srid, center } = toRefs(props);
+onMounted(() => {});
+
+const onBeforeMapChanged = () => {
+  return srid.value === 3857;
+};
+
+const onGetWebMapUrl = (type) => {
+  const cpt = transform(center.value, `EPSG:${srid.value}`, `EPSG:4326`);
+  if (type === "GAODE") {
+    return `/webmap/gaode.html?x=${cpt[0]}&y=${cpt[1]}&z=14&key=${appConfig.getGaoDe.key}&password=${appConfig.getGaoDe.password}`;
+  } else if (type === "GOOGLE") {
+    return `/webmap/google.html?x=${cpt[0]}&y=${cpt[1]}&z=14&key=${appConfig.getGoogle.key}`;
+  } else if (type === "BING") {
+    return `/webmap/bing.html?x=${cpt[0]}&y=${cpt[1]}&z=14&key=${appConfig.getBing.key}`;
+  } else if (type === "TIANDITU") {
+    return `/webmap/tianditu.html?x=${cpt[0]}&y=${cpt[1]}&z=14&key=${appConfig.getTianDitu.key}`;
+  }
+
+  return `/webmap/nomap.html`;
+};
 </script>
