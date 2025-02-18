@@ -1,5 +1,5 @@
 <template>
-  <ResizeableDialog @accept="onAccept">
+  <ResizeableDialog @accept="onAccept" caption="API keys for web map service">
     <template v-slot:content>
       <q-form class="full-width q-pt-md q-gutter-sm">
         <label>GaoDe:</label>
@@ -11,11 +11,22 @@
           v-model="appConfig.$state.webMapKeys.GaoDe.key"
           :rules="[true]"
         ></InputPassword>
+
         <InputPassword
           outlined
           dense
           label="password"
           v-model="appConfig.$state.webMapKeys.GaoDe.password"
+          :rules="[true]"
+        ></InputPassword>
+
+        <label>QQ:</label>
+        <InputPassword
+          class="q-pa-none"
+          outlined
+          dense
+          label="key"
+          v-model="appConfig.$state.webMapKeys.QQ.key"
           :rules="[true]"
         ></InputPassword>
         <label>Google:</label>
@@ -68,6 +79,7 @@ const onAccept = () => {
       bing_key: appConfig.$state.webMapKeys.Bing.key,
       google_key: appConfig.$state.webMapKeys.Google.key,
       tianditu_key: appConfig.$state.webMapKeys.TianDiTu.key,
+      qq_key: appConfig.$state.webMapKeys.QQ.key,
     },
   });
 };

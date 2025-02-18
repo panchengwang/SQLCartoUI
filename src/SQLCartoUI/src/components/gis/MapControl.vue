@@ -68,6 +68,8 @@ const onGetWebMapUrl = (type) => {
     return `/webmap/bing.html?x=${cpt[0]}&y=${cpt[1]}&z=14&key=${appConfig.getBing.key}`;
   } else if (type === "TIANDITU") {
     return `/webmap/tianditu.html?x=${cpt[0]}&y=${cpt[1]}&z=14&key=${appConfig.getTianDitu.key}`;
+  } else if (type === "QQ") {
+    return `/webmap/qq.html?x=${cpt[0]}&y=${cpt[1]}&z=14&key=${appConfig.getQQ.key}`;
   }
 
   return `/webmap/nomap.html`;

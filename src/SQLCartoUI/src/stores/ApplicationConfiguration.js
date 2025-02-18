@@ -17,6 +17,9 @@ export const useAppConfig = defineStore('appconfig', {
       Google: {
         key: '',
       },
+      QQ: {
+        key: '',
+      },
     },
     token: '',
     username: '',
@@ -29,6 +32,7 @@ export const useAppConfig = defineStore('appconfig', {
     getTianDitu: (state) => state.webMapKeys.TianDiTu,
     getBing: (state) => state.webMapKeys.Bing,
     getGoogle: (state) => state.webMapKeys.Google,
+    getQQ: (state) => state.webMapKeys.QQ,
     hasLogin: (state) => {
       state.token.trim() !== '' && state.username.trim() !== ''
     },
@@ -47,6 +51,9 @@ export const useAppConfig = defineStore('appconfig', {
     },
     setGoogle(key) {
       this.webMapKeys.Google.key = key
+    },
+    setQQ(key) {
+      this.webMapKeys.QQ.key = key
     },
     setAccountInformation(username, token) {
       this.token = token
@@ -72,6 +79,7 @@ export const useAppConfig = defineStore('appconfig', {
           this.webMapKeys.Bing.key = webmapkeys.bing_key
           this.webMapKeys.TianDiTu.key = webmapkeys.tianditu_key
           this.webMapKeys.Google.key = webmapkeys.google_key
+          this.webMapKeys.QQ.key = webmapkeys.qq_key
         },
       )
     },

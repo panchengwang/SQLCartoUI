@@ -172,6 +172,12 @@ const webMaps = [
     caption: "高德地图",
   },
   {
+    icon: "/icons/qq.svg",
+    label: "QQ",
+    type: "QQ",
+    caption: "腾讯地图",
+  },
+  {
     icon: "/icons/google.png",
     label: "Google",
     type: "GOOGLE",
@@ -212,6 +218,8 @@ const switchTo = (item) => {
     switchToBing();
   } else if (item.type === "TIANDITU") {
     switchToTianDiTu();
+  } else if (item.type === "QQ") {
+    switchToQQ();
   } else {
     webMapControl.value.src = getWebMapUrl.value();
   }
@@ -251,6 +259,18 @@ const switchToBing = () => {
     return;
   }
   webMapControl.value.src = getWebMapUrl.value("BING"); //`/webmap/bing.html?x=112.957273&y=28.199262&z=14&key=${appConfig.getBing.key}`;
+};
+
+const switchToQQ = () => {
+  if (appConfig.getQQ.key.trim() === "") {
+    $q.notify({
+      position: "top",
+      type: "negative",
+      message: "Please set key  of QQ web map.",
+    });
+    return;
+  }
+  webMapControl.value.src = getWebMapUrl.value("QQ"); //`/webmap/tianditu.html?x=112.957273&y=28.199262&z=14&key=${appConfig.getTianDitu.key}`;
 };
 
 const switchToTianDiTu = () => {
