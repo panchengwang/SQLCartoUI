@@ -66,21 +66,34 @@ import { useAppConfig } from "src/stores/ApplicationConfiguration";
 import ResizeableDialog from "src/components/dialog/ResizeableDialog.vue";
 import InputPassword from "../form/InputPassword.vue";
 import SQLCartoDatabase from "src/net/SQLCartoDatabase";
+import { useQuasar } from "quasar";
 const appConfig = useAppConfig();
+const $q = useQuasar();
 
 const onAccept = () => {
   const db = new SQLCartoDatabase();
-  db.userSaveWebMapKeys({
-    username: appConfig.$state.username,
-    token: appConfig.$state.token,
-    webmapkeys: {
-      gaode_key: appConfig.webMapKeys.GaoDe.key,
-      gaode_password: appConfig.$state.webMapKeys.GaoDe.password,
-      bing_key: appConfig.$state.webMapKeys.Bing.key,
-      google_key: appConfig.$state.webMapKeys.Google.key,
-      tianditu_key: appConfig.$state.webMapKeys.TianDiTu.key,
-      qq_key: appConfig.$state.webMapKeys.QQ.key,
+  db.userSaveWebMapKeys(
+    {
+      username: appConfig.$state.username,
+      token: appConfig.$state.token,
+      webmapkeys: {
+        gaode_key: appConfig.webMapKeys.GaoDe.key,
+        gaode_password: appConfig.$state.webMapKeys.GaoDe.password,
+        bing_key: appConfig.$state.webMapKeys.Bing.key,
+        google_key: appConfig.$state.webMapKeys.Google.key,
+        tianditu_key: appConfig.$state.webMapKeys.TianDiTu.key,
+        qq_key: appConfig.$state.webMapKeys.QQ.key,
+      },
     },
-  });
+    (response) => {
+      if (!response.success) {
+        $q.notify({
+          type: "negative",
+          position: "top",
+          message: response.message,
+        });
+      }
+    }
+  );
 };
 </script>

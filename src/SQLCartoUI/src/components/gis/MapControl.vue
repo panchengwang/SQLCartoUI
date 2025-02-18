@@ -10,13 +10,14 @@
       ref="mapCanvas"
       @contextmenu.prevent="null"
       :srid="srid"
+      :center="center"
     ></MapCanvas>
     <WebMapSwitcher
       class="absolute"
       style="right: 10px; top: 10px; width: 200px"
       v-show="srid === 3857 || srid === 900913"
-      :webMapControl="webMapControl"
-      :before-map-changed="onBeforeMapChanged"
+      :web-map-control="webMapControl"
+      :before-map-changed="onBeforeWebMapChanged"
       :get-web-map-url="onGetWebMapUrl"
     ></WebMapSwitcher>
   </div>
@@ -54,8 +55,8 @@ const props = defineProps({
 const { srid, center } = toRefs(props);
 onMounted(() => {});
 
-const onBeforeMapChanged = () => {
-  return srid.value === 3857;
+const onBeforeWebMapChanged = () => {
+  return [900913, 3857, 4326].indexOf(srid.value) >= 0;
 };
 
 const onGetWebMapUrl = (type) => {
