@@ -13,6 +13,13 @@
         padding: 0;
         margin: 0;
       }
+
+      .amap-logo {
+        display: none !important;
+      }
+      .amap-copyright {
+        display: none !important;
+      }
     </style>
 
     <script type="text/javascript">
@@ -129,6 +136,10 @@
         } else {
           trafficLayer.hide()
         }
+      }
+
+      function setZoom(z) {
+        map.setZoom(z)
       }
     </script>
   </head>

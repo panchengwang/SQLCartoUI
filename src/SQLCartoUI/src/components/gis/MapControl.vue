@@ -9,8 +9,7 @@
       class="absolute full-width full-height q-pa-none no-scroll"
       ref="mapCanvas"
       @contextmenu.prevent="null"
-      :srid="srid"
-      :center="center"
+      @mapViewChanged="onMapViewChanged"
     ></MapCanvas>
     <WebMapSwitcher
       class="absolute"
@@ -26,7 +25,7 @@
 <script setup>
 import MapCanvas from "./MapCanvas.vue";
 // import { useId } from "quasar";
-import { onMounted, ref, toRefs } from "vue";
+import { onMounted, ref } from "vue";
 // import { useAppConfig } from "src/stores/useAppConfig.js";
 import WebMapSwitcher from "./WebMapSwitcher.vue";
 import { useAppConfig } from "src/stores/ApplicationConfiguration";
@@ -37,42 +36,42 @@ const mapCanvas = ref(null);
 const webMapControl = ref(null);
 const appConfig = useAppConfig();
 
-const props = defineProps({
-  srid: {
-    type: Number,
-    default: 3857,
-  },
-  center: {
-    type: Array,
-    default: () => transform([112.957273, 28.199262], "EPSG:4326", "EPSG:3857"),
-  },
-  zoom: {
-    type: Number,
-    default: 1,
-  },
+const center = ref(transform([112.957273, 28.199262], "EPSG:4326", "EPSG:3857"));
+const srid = ref(3857);
+const scale = ref(0.001);
+const zoom = ref(0);
+onMounted(() => {
+  mapCanvas.value.setCenter(center.value);
+  mapCanvas.value.setScale(scale.value);
+  zoom.value = mapCanvas.value.getZoom();
 });
 
-const { srid, center } = toRefs(props);
-onMounted(() => {});
-
 const onBeforeWebMapChanged = () => {
-  return [900913, 3857, 4326].indexOf(srid.value) >= 0;
+  return [900913, 3857].indexOf(srid.value) >= 0;
 };
 
 const onGetWebMapUrl = (type) => {
   const cpt = transform(center.value, `EPSG:${srid.value}`, `EPSG:4326`);
   if (type === "GAODE") {
-    return `/webmap/gaode.html?x=${cpt[0]}&y=${cpt[1]}&z=14&key=${appConfig.getGaoDe.key}&password=${appConfig.getGaoDe.password}`;
+    return `/webmap/gaode.html?x=${cpt[0]}&y=${cpt[1]}&z=${zoom.value}&key=${appConfig.getGaoDe.key}&password=${appConfig.getGaoDe.password}`;
   } else if (type === "GOOGLE") {
-    return `/webmap/google.html?x=${cpt[0]}&y=${cpt[1]}&z=14&key=${appConfig.getGoogle.key}`;
+    return `/webmap/google.html?x=${cpt[0]}&y=${cpt[1]}&z=${zoom.value}&key=${appConfig.getGoogle.key}`;
   } else if (type === "BING") {
-    return `/webmap/bing.html?x=${cpt[0]}&y=${cpt[1]}&z=14&key=${appConfig.getBing.key}`;
+    return `/webmap/bing.html?x=${cpt[0]}&y=${cpt[1]}&z=${zoom.value}&key=${appConfig.getBing.key}`;
   } else if (type === "TIANDITU") {
-    return `/webmap/tianditu.html?x=${cpt[0]}&y=${cpt[1]}&z=14&key=${appConfig.getTianDitu.key}`;
+    return `/webmap/tianditu.html?x=${cpt[0]}&y=${cpt[1]}&z=${zoom.value}&key=${appConfig.getTianDitu.key}`;
   } else if (type === "QQ") {
-    return `/webmap/qq.html?x=${cpt[0]}&y=${cpt[1]}&z=14&key=${appConfig.getQQ.key}`;
+    return `/webmap/qq.html?x=${cpt[0]}&y=${cpt[1]}&z=${zoom.value}&key=${appConfig.getQQ.key}`;
   }
 
   return `/webmap/nomap.html`;
+};
+
+const onMapViewChanged = (view) => {
+  if (view.zoom) {
+    webMapControl.value.contentWindow.setZoom(view.zoom);
+    zoom.value = view.zoom;
+    center.value = view.center;
+  }
 };
 </script>
