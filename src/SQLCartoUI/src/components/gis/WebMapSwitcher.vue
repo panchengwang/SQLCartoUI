@@ -68,7 +68,7 @@
       style="right: 0px; top: 40px"
       v-show="currentWebMap.type !== 'NOMAP'"
     >
-      <q-btn color="indigo-1" text-color="grey-8" dense>
+      <q-btn color="indigo-1" text-color="grey-8" dense style="border-radius: 8px">
         <q-avatar
           square
           style="border-radius: 4px"
@@ -80,7 +80,7 @@
           <img src="/icons/default.png" />
         </q-avatar>
       </q-btn>
-      <q-btn color="indigo-1" text-color="grey-8" dense>
+      <q-btn color="indigo-1" text-color="grey-8" dense style="border-radius: 8px">
         <q-avatar
           square
           style="border-radius: 4px"
@@ -98,6 +98,7 @@
         dense
         :disable="['TIANDITU', 'GOOGLE', 'BING'].indexOf(currentWebMap.type) >= 0"
         @click="onShowTrafficMap()"
+        style="border-radius: 8px"
       >
         <q-avatar
           square
@@ -119,6 +120,7 @@
         label="Labels"
         no-caps
         @click="onSwitchLabelVisible()"
+        style="border-radius: 8px"
       >
       </q-btn>
     </div>

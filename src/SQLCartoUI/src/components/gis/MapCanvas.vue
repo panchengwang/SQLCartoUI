@@ -42,21 +42,37 @@ const resolutions = [
 const emits = defineEmits(["mapViewChanged"]);
 const center = ref([0, 0]);
 const scale = ref(1.0);
-const srid = ref(3857);
+const srid = ref(4326);
 const zoom = ref(0);
+const drawOperation = ref("POINT");
+const isDragging = ref(false);
+const draftGeometries = ref([]);
+// const moveingPoint = ref([0,0])
+let dragStart = [0, 0];
+let dragEnd = [0, 0];
+let offscreenCanvas = null;
+let offscreenContext = null;
 
-// let _scale = scale.value;
-// let _center = center.value;
+const getScale = () => {
+  return scale.value;
+};
 
-onMounted(() => {
-  setCenter(center.value);
-  setScale(scale.value);
-  zoom.value = getNearistZoomOfScale(scale.value);
-  canvas.value.addEventListener("wheel", onWheel);
-});
-onBeforeUnmount(() => {
-  canvas.value.removeEventListener("wheel", onWheel);
-});
+const getCenter = () => {
+  return center.value;
+};
+
+const getResolutionOfZoom = (z) => {
+  return resolutions[z];
+};
+
+const getZoom = () => {
+  return zoom.value;
+};
+
+const getSrid = () => {
+  return srid.value;
+};
+
 const setCenter = (pt) => {
   center.value = pt;
 };
@@ -75,6 +91,7 @@ const getNearistZoomOfScale = (s) => {
   }
   return z;
 };
+
 const setScale = (s) => {
   if (srid.value === 3857) {
     let z = getNearistZoomOfScale(s);
@@ -84,9 +101,44 @@ const setScale = (s) => {
     scale.value = s;
   }
 };
+
+const setSrid = (id) => {
+  srid.value = id;
+};
+
+const setDrawOperation = (op) => {
+  drawOperation.value = op;
+};
+const getDrawOperation = () => {
+  return drawOperation.value;
+};
+
+const drawDraft = () => {
+  for (let i = 0; i < draftGeometries.value.length; i++) {
+    console.log(draftGeometries.value[i]);
+  }
+  console.log(dragStart, dragEnd);
+};
+onMounted(() => {
+  setCenter(center.value);
+  setScale(scale.value);
+  zoom.value = getNearistZoomOfScale(scale.value);
+  canvas.value.addEventListener("wheel", onWheel);
+  canvas.value.addEventListener("mousedown", onMouseDown);
+  canvas.value.addEventListener("mouseup", onMouseUp);
+  canvas.value.addEventListener("mousemove", onMouseMove);
+
+  offscreenCanvas = document.createElement("canvas");
+  offscreenContext = offscreenCanvas.getContext("2d");
+});
+onBeforeUnmount(() => {
+  canvas.value.removeEventListener("wheel", onWheel);
+  offscreenCanvas.remove();
+});
+
 const onWheel = throttle((e) => {
   e.preventDefault();
-  if (srid.value === 3857) {
+  if ([3857, 900913].indexOf(srid.value) >= 0) {
     if (e.deltaY > 0) {
       zoom.value--;
     } else {
@@ -119,30 +171,71 @@ const onWheel = throttle((e) => {
 }, 300);
 
 const onResize = (size) => {
-  console.log(size);
   canvas.value.width = size.width;
   canvas.value.height = size.height;
+  offscreenCanvas.width = size.width;
+  offscreenCanvas.height = size.height;
 };
 
-const getScale = () => {
-  return scale.value;
+const pixelToMap = (pixel) => {
+  let x = (pixel[0] - canvas.value.width * 0.5) / scale.value + center.value[0];
+  let y = center.value[1] - (pixel[1] - canvas.value.height * 0.5) / scale.value;
+  return [x, y];
 };
-const getCenter = () => {
-  return center.value;
+
+const mapToPixel = (coord) => {
+  let x = canvas.value.width * 0.5 + (coord[0] - center.value[0]) * scale.value;
+  let y = canvas.value.height * 0.5 - (coord[1] - center.value[1]) * scale.value;
+  return [x, y];
 };
-const getResolutionOfZoom = (z) => {
-  return resolutions[z];
+
+const onMouseDown = (e) => {
+  let coord = pixelToMap([e.offsetX, e.offsetY]);
+
+  if (e.button === 0) {
+    if (drawOperation.value === "POINT") {
+      draftGeometries.value.push(coord);
+    } else if (drawOperation.value === "LINESTRING") {
+      console.log("draw linestring");
+    } else if (drawOperation.value === "POLYGON") {
+      console.log("draw polygon");
+    }
+  }
 };
-const getZoom = () => {
-  return zoom.value;
+
+const onMouseUp = (e) => {
+  let coord = pixelToMap([e.offsetX, e.offsetY]);
+  console.log("center 2: ", coord);
+  isDragging.value = false;
 };
+
+const onMouseMove = (e) => {
+  let coord = pixelToMap([e.offsetX, e.offsetY]);
+
+  if (e.buttons === 1) {
+    if (!isDragging.value) {
+      dragStart = dragEnd = coord;
+    } else {
+      dragEnd = coord;
+    }
+    isDragging.value = true;
+    drawDraft();
+  }
+};
+
 defineExpose({
   setCenter,
   getCenter,
   setScale,
   getScale,
+  setSrid,
+  getSrid,
   getResolutionOfZoom,
   getZoom,
   getNearistZoomOfScale,
+  setDrawOperation,
+  getDrawOperation,
+  pixelToMap,
+  mapToPixel,
 });
 </script>
