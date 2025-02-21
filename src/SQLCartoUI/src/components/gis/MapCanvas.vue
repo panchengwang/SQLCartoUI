@@ -9,6 +9,7 @@
 import { useId } from "quasar";
 import { onMounted, onBeforeUnmount, ref } from "vue";
 import { throttle } from "quasar";
+import { LineString, Point } from "ol/geom";
 
 const mapId = useId();
 const canvas = ref(null);
@@ -47,7 +48,7 @@ const zoom = ref(0);
 const drawOperation = ref("POINT");
 const isDragging = ref(false);
 const draftGeometries = ref([]);
-// const moveingPoint = ref([0,0])
+
 let dragStart = [0, 0];
 let dragEnd = [0, 0];
 let offscreenCanvas = null;
@@ -114,10 +115,24 @@ const getDrawOperation = () => {
 };
 
 const drawDraft = () => {
+  offscreenContext.clearRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
   for (let i = 0; i < draftGeometries.value.length; i++) {
-    console.log(draftGeometries.value[i]);
+    drawGeometry(mapToPixel(draftGeometries.value[i]));
   }
   console.log(dragStart, dragEnd);
+
+  const ctx = canvas.value.getContext("2d");
+  ctx.clearRect(0, 0, canvas.value.width, canvas.value.height);
+  ctx.drawImage(offscreenCanvas, 0, 0);
+};
+
+const drawGeometry = (geo) => {
+  if (geo instanceof Point) {
+    let coord = geo.getCoordinates();
+    offscreenContext.beginPath();
+    offscreenContext.arc(coord[0], coord[1], 5, 0, 2 * Math.PI);
+    offscreenContext.stroke();
+  }
 };
 onMounted(() => {
   setCenter(center.value);
@@ -127,8 +142,13 @@ onMounted(() => {
   canvas.value.addEventListener("mousedown", onMouseDown);
   canvas.value.addEventListener("mouseup", onMouseUp);
   canvas.value.addEventListener("mousemove", onMouseMove);
-
   offscreenCanvas = document.createElement("canvas");
+  offscreenContext = offscreenCanvas.getContext("2d");
+  var parentStyles = window.getComputedStyle(document.getElementById(mapId.value));
+  canvas.value.width = parseInt(parentStyles.getPropertyValue("width"));
+  canvas.value.height = parseInt(parentStyles.getPropertyValue("height"));
+  offscreenCanvas.width = canvas.value.width;
+  offscreenCanvas.height = canvas.value.height;
   offscreenContext = offscreenCanvas.getContext("2d");
 });
 onBeforeUnmount(() => {
@@ -168,25 +188,52 @@ const onWheel = throttle((e) => {
       scale: scale.value,
     });
   }
+  drawDraft();
 }, 300);
 
 const onResize = (size) => {
   canvas.value.width = size.width;
   canvas.value.height = size.height;
-  offscreenCanvas.width = size.width;
-  offscreenCanvas.height = size.height;
+  console.log("width:", canvas.value.width);
+  console.log("height:", canvas.value.height);
+  if (offscreenCanvas) {
+    offscreenCanvas.width = canvas.value.width;
+    offscreenCanvas.height = canvas.value.height;
+    offscreenContext = offscreenCanvas.getContext("2d");
+    drawDraft();
+  }
 };
 
-const pixelToMap = (pixel) => {
-  let x = (pixel[0] - canvas.value.width * 0.5) / scale.value + center.value[0];
-  let y = center.value[1] - (pixel[1] - canvas.value.height * 0.5) / scale.value;
-  return [x, y];
+const pixelToMap = (geo) => {
+  if (geo instanceof Array) {
+    let x = (geo[0] - canvas.value.width * 0.5) / scale.value + center.value[0];
+    let y = center.value[1] - (geo[1] - canvas.value.height * 0.5) / scale.value;
+    return [x, y];
+  } else if (geo instanceof Point) {
+    return new Point(pixelToMap(geo.getCoordinates()));
+  } else if (geo instanceof LineString) {
+    let coords = geo.getCoordinates();
+    for (let i = 0; i < coords.length; i++) {
+      coords[i] = pixelToMap(coords[i]);
+    }
+    return new LineString(coords);
+  }
 };
 
-const mapToPixel = (coord) => {
-  let x = canvas.value.width * 0.5 + (coord[0] - center.value[0]) * scale.value;
-  let y = canvas.value.height * 0.5 - (coord[1] - center.value[1]) * scale.value;
-  return [x, y];
+const mapToPixel = (geo) => {
+  if (geo instanceof Array) {
+    let x = canvas.value.width * 0.5 + (geo[0] - center.value[0]) * scale.value;
+    let y = canvas.value.height * 0.5 - (geo[1] - center.value[1]) * scale.value;
+    return [x, y];
+  } else if (geo instanceof Point) {
+    return new Point(mapToPixel(geo.getCoordinates()));
+  } else if (geo instanceof LineString) {
+    let coords = geo.getCoordinates();
+    for (let i = 0; i < coords.length; i++) {
+      coords[i] = mapToPixel(coords[i]);
+    }
+    return new LineString(coords);
+  }
 };
 
 const onMouseDown = (e) => {
@@ -194,18 +241,28 @@ const onMouseDown = (e) => {
 
   if (e.button === 0) {
     if (drawOperation.value === "POINT") {
-      draftGeometries.value.push(coord);
+      // draftGeometries.value.push(new Point(coord));
     } else if (drawOperation.value === "LINESTRING") {
       console.log("draw linestring");
     } else if (drawOperation.value === "POLYGON") {
       console.log("draw polygon");
     }
   }
+  coord[0];
 };
 
 const onMouseUp = (e) => {
   let coord = pixelToMap([e.offsetX, e.offsetY]);
-  console.log("center 2: ", coord);
+  if (e.button === 0) {
+    if (drawOperation.value === "POINT") {
+      draftGeometries.value.push(new Point(coord));
+      drawDraft();
+    } else if (drawOperation.value === "LINESTRING") {
+      console.log("draw linestring");
+    } else if (drawOperation.value === "POLYGON") {
+      console.log("draw polygon");
+    }
+  }
   isDragging.value = false;
 };
 
