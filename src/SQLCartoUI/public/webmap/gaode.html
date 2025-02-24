@@ -138,8 +138,17 @@
         }
       }
 
-      function setZoom(z) {
-        map.setZoom(z)
+      // function setZoom(z) {
+      //   map.setZoom(z)
+      // }
+
+      // function setCenter(center) {
+      //   map.setCenter(center)
+      // }
+
+      function setView(center, zoom) {
+        map.setZoom(zoom)
+        map.setCenter(center)
       }
     </script>
   </head>

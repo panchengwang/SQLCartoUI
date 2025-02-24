@@ -119,8 +119,17 @@
         showLayer('SATELLITE')
       }
 
-      function setZoom(z) {
-        map.getView().setZoom(z)
+      // function setZoom(z) {
+      //   map.getView().setZoom(z)
+      // }
+
+      // function setCenter(center) {
+      //   map.getView().setCenter(ol.proj.transform(center, 'EPSG:4326', 'EPSG:3857'))
+      // }
+
+      function setView(center, zoom) {
+        map.getView().setZoom(zoom)
+        map.getView().setCenter(ol.proj.transform(center, 'EPSG:4326', 'EPSG:3857'))
       }
     </script>
   </head>

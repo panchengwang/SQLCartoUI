@@ -45,12 +45,14 @@ const center = ref([0, 0]);
 const scale = ref(1.0);
 const srid = ref(4326);
 const zoom = ref(0);
-const drawOperation = ref("POINT");
-const isDragging = ref(false);
-const draftGeometries = ref([]);
-
-let dragStart = [0, 0];
-let dragEnd = [0, 0];
+const drawOperation = ref("LINESTRING");
+let isDragging = false;
+let draftGeometries = [];
+let draftCoordinates = [];
+let draftMoveingCoordinate = null;
+let drawStart = false;
+// let dragStart = [0, 0];
+// let dragEnd = [0, 0];
 let offscreenCanvas = null;
 let offscreenContext = null;
 
@@ -116,23 +118,49 @@ const getDrawOperation = () => {
 
 const drawDraft = () => {
   offscreenContext.clearRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
-  for (let i = 0; i < draftGeometries.value.length; i++) {
-    drawGeometry(mapToPixel(draftGeometries.value[i]));
+  for (let i = 0; i < draftGeometries.length; i++) {
+    drawGeometry(mapToPixel(draftGeometries[i]));
   }
-  console.log(dragStart, dragEnd);
-
+  // console.log(dragStart, dragEnd);
+  if (drawStart) {
+    if (drawOperation.value === "LINESTRING") {
+      if (draftCoordinates.length > 0) {
+        offscreenContext.beginPath();
+        let coord = mapToPixel(draftCoordinates[0]);
+        offscreenContext.moveTo(coord[0], coord[1]);
+        for (let i = 1; i < draftCoordinates.length; i++) {
+          coord = mapToPixel(draftCoordinates[i]);
+          offscreenContext.lineTo(coord[0], coord[1]);
+        }
+        coord = mapToPixel(draftMoveingCoordinate);
+        offscreenContext.lineTo(coord[0], coord[1]);
+        offscreenContext.stroke();
+      }
+    }
+  }
   const ctx = canvas.value.getContext("2d");
   ctx.clearRect(0, 0, canvas.value.width, canvas.value.height);
-  ctx.drawImage(offscreenCanvas, 0, 0);
+  ctx.drawImage(offscreenCanvas, 0, 0, canvas.value.width, canvas.value.height);
 };
 
 const drawGeometry = (geo) => {
+  offscreenContext.lineWidth = 1.0;
+  offscreenContext.beginPath();
   if (geo instanceof Point) {
     let coord = geo.getCoordinates();
-    offscreenContext.beginPath();
+
     offscreenContext.arc(coord[0], coord[1], 5, 0, 2 * Math.PI);
-    offscreenContext.stroke();
+  } else if (geo instanceof LineString) {
+    let coords = geo.getCoordinates();
+    // console.log("coords: ", coords);
+    if (coords.length >= 2) {
+      offscreenContext.moveTo(coords[0][0], coords[0][1]);
+      for (let i = 1; i < coords.length; i++) {
+        offscreenContext.lineTo(coords[i][0], coords[i][1]);
+      }
+    }
   }
+  offscreenContext.stroke();
 };
 onMounted(() => {
   setCenter(center.value);
@@ -158,6 +186,7 @@ onBeforeUnmount(() => {
 
 const onWheel = throttle((e) => {
   e.preventDefault();
+  let coord1 = pixelToMap([e.offsetX, e.offsetY]);
   if ([3857, 900913].indexOf(srid.value) >= 0) {
     if (e.deltaY > 0) {
       zoom.value--;
@@ -170,7 +199,11 @@ const onWheel = throttle((e) => {
       zoom.value = 23;
     }
     scale.value = 1.0 / resolutions[zoom.value];
-
+    let coord2 = pixelToMap([e.offsetX, e.offsetY]);
+    const xoff = coord1[0] - coord2[0];
+    const yoff = coord1[1] - coord2[1];
+    center.value[0] += xoff;
+    center.value[1] += yoff;
     emits("mapViewChanged", {
       zoom: zoom.value,
       center: center.value,
@@ -182,6 +215,12 @@ const onWheel = throttle((e) => {
     } else {
       scale.value *= 0.5;
     }
+
+    let coord2 = pixelToMap([e.offsetX, e.offsetY]);
+    const xoff = coord1[0] - coord2[0];
+    const yoff = coord1[1] - coord2[1];
+    center.value[0] += xoff;
+    center.value[1] += yoff;
     emits("mapViewChanged", {
       zoom: false,
       center: center.value,
@@ -255,29 +294,46 @@ const onMouseUp = (e) => {
   let coord = pixelToMap([e.offsetX, e.offsetY]);
   if (e.button === 0) {
     if (drawOperation.value === "POINT") {
-      draftGeometries.value.push(new Point(coord));
-      drawDraft();
+      draftGeometries.push(new Point(coord));
     } else if (drawOperation.value === "LINESTRING") {
-      console.log("draw linestring");
+      if (!drawStart) {
+        drawStart = true;
+      }
+      if (!isDragging) {
+        draftCoordinates.push(coord);
+      }
     } else if (drawOperation.value === "POLYGON") {
       console.log("draw polygon");
     }
+    drawDraft();
+  } else if (e.button === 2) {
+    if (drawOperation.value === "LINESTRING") {
+      drawStart = false;
+      if (draftCoordinates.length >= 2) {
+        draftGeometries.push(new LineString(draftCoordinates));
+      }
+      drawDraft();
+    }
+
+    draftCoordinates.length = 0;
   }
-  isDragging.value = false;
+  isDragging = false;
 };
 
 const onMouseMove = (e) => {
   let coord = pixelToMap([e.offsetX, e.offsetY]);
-
+  draftMoveingCoordinate = coord;
   if (e.buttons === 1) {
-    if (!isDragging.value) {
-      dragStart = dragEnd = coord;
-    } else {
-      dragEnd = coord;
-    }
-    isDragging.value = true;
+    // if (!isDragging) {
+    //   dragStart = dragEnd = coord;
+    // } else {
+    //   dragEnd = coord;
+    // }
+    isDragging = true;
+    console.log(e, isDragging);
     drawDraft();
   }
+  drawDraft();
 };
 
 defineExpose({

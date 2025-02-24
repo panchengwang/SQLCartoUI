@@ -30,7 +30,7 @@ import { onMounted, ref } from "vue";
 import WebMapSwitcher from "./WebMapSwitcher.vue";
 import { useAppConfig } from "src/stores/ApplicationConfiguration";
 import { transform } from "ol/proj";
-import getDPI from "src/utils/GetDPI";
+import getDPI from "src/utils/getDPI";
 // const mapid = useId();
 const mapCanvas = ref(null);
 const webMapControl = ref(null);
@@ -46,7 +46,7 @@ onMounted(() => {
   mapCanvas.value.setScale(scale.value);
   scale.value = mapCanvas.value.getScale();
   zoom.value = mapCanvas.value.getZoom();
-  console.log("onMount:", 1.0 / scale.value, zoom.value);
+  webMapControl.value.src = "/webmap/nomap.html";
 });
 
 const onBeforeWebMapChanged = () => {
@@ -72,7 +72,8 @@ const onGetWebMapUrl = (type) => {
 
 const onMapViewChanged = (view) => {
   if (view.zoom) {
-    webMapControl.value.contentWindow.setZoom(view.zoom);
+    const center = transform(view.center, `EPSG:${srid.value}`, `EPSG:4326`);
+    webMapControl.value.contentWindow.setView(center, view.zoom);
     zoom.value = view.zoom;
     center.value = view.center;
   }

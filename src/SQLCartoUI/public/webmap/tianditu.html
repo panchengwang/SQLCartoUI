@@ -146,8 +146,15 @@
         })
       })
 
-      function setZoom(z) {
-        map.setZoom(z)
+      // function setZoom(z) {
+      //   map.panTo(map.getCenter(), z)
+      // }
+      // function setCenter(center) {
+      //   map.panTo(new T.LngLat(center[0], center[1]), map.getZoom())
+      // }
+
+      function setView(center, zoom) {
+        map.panTo(new T.LngLat(center[0], center[1]), zoom)
       }
     </script>
   </head>

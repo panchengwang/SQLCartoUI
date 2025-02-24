@@ -133,8 +133,17 @@
         })
       })
 
-      function setZoom(z) {
-        map.setZoom(z)
+      // function setZoom(z) {
+      //   map.setZoom(z)
+      // }
+
+      // function setCenter(center) {
+      //   map.setCenter(new TMap.LatLng(center[1], center[0]))
+      // }
+
+      function setView(center, zoom) {
+        map.setZoom(zoom)
+        map.setCenter(new TMap.LatLng(center[1], center[0]))
       }
     </script>
   </head>
