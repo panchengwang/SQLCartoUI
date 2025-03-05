@@ -40,6 +40,7 @@ const center = ref(transform([112.957273, 28.199262], "EPSG:4326", "EPSG:3857"))
 const srid = ref(3857);
 const scale = ref(getDPI() / 2.54 / 1000.0);
 const zoom = ref(0);
+
 onMounted(() => {
   mapCanvas.value.setSrid(srid.value);
   mapCanvas.value.setCenter(center.value);
@@ -50,7 +51,7 @@ onMounted(() => {
 });
 
 const onBeforeWebMapChanged = () => {
-  return [900913, 3857].indexOf(srid.value) >= 0;
+  return [900913, 3857].includes(srid.value);
 };
 
 const onGetWebMapUrl = (type) => {
@@ -72,8 +73,8 @@ const onGetWebMapUrl = (type) => {
 
 const onMapViewChanged = (view) => {
   if (view.zoom) {
-    const center = transform(view.center, `EPSG:${srid.value}`, `EPSG:4326`);
-    webMapControl.value.contentWindow.setView(center, view.zoom);
+    const viewCenter = transform(view.center, `EPSG:${srid.value}`, `EPSG:4326`);
+    webMapControl.value.contentWindow.setView(viewCenter, view.zoom);
     zoom.value = view.zoom;
     center.value = view.center;
   }

@@ -9,7 +9,7 @@
 import { useId } from "quasar";
 import { onMounted, onBeforeUnmount, ref } from "vue";
 import { throttle } from "quasar";
-import { LineString, Point } from "ol/geom";
+import { LinearRing, LineString, Point, Polygon } from "ol/geom";
 
 const mapId = useId();
 const canvas = ref(null);
@@ -45,14 +45,16 @@ const center = ref([0, 0]);
 const scale = ref(1.0);
 const srid = ref(4326);
 const zoom = ref(0);
-const drawOperation = ref("LINESTRING");
+const drawOperation = ref("POLYGON");
+
+let draftFillColor = "rgba(255,255,0,0.3)";
 let isDragging = false;
 let draftGeometries = [];
 let draftCoordinates = [];
 let draftMoveingCoordinate = null;
 let drawStart = false;
-// let dragStart = [0, 0];
-// let dragEnd = [0, 0];
+let dragStart = [0, 0];
+let dragEnd = [0, 0];
 let offscreenCanvas = null;
 let offscreenContext = null;
 
@@ -116,52 +118,197 @@ const getDrawOperation = () => {
   return drawOperation.value;
 };
 
+const drawPath = (coordinates) => {
+  let coord = mapToPixel(coordinates[0]);
+  offscreenContext.moveTo(coord[0], coord[1]);
+  for (let i = 1; i < coordinates.length; i++) {
+    coord = mapToPixel(coordinates[i]);
+    offscreenContext.lineTo(coord[0], coord[1]);
+  }
+};
+
+const drawPolygonDraft = () => {
+  if (draftCoordinates.length > 0) {
+    offscreenContext.beginPath();
+    drawPath(draftCoordinates);
+
+    const [startPixelX, startPixelY] = mapToPixel(draftCoordinates[0]);
+    const [movePixelX, movePixelY] = mapToPixel(draftMoveingCoordinate);
+
+    offscreenContext.lineTo(movePixelX, movePixelY);
+    offscreenContext.lineTo(startPixelX, startPixelY);
+
+    offscreenContext.fillStyle = draftFillColor;
+    offscreenContext.fill();
+
+    offscreenContext.strokeStyle = "white";
+    offscreenContext.lineWidth = 4.0;
+    offscreenContext.stroke();
+
+    offscreenContext.strokeStyle = "black";
+    offscreenContext.lineWidth = 1.0;
+    offscreenContext.stroke();
+  }
+};
+
+const drawLineStringDraft = () => {
+  if (draftCoordinates.length > 0) {
+    offscreenContext.beginPath();
+    drawPath(draftCoordinates);
+    offscreenContext.lineTo(
+      mapToPixel(draftMoveingCoordinate)[0],
+      mapToPixel(draftMoveingCoordinate)[1]
+    );
+    offscreenContext.strokeStyle = "white";
+    offscreenContext.lineWidth = 4.0;
+    offscreenContext.stroke();
+
+    offscreenContext.strokeStyle = "black";
+    offscreenContext.lineWidth = 1.0;
+    offscreenContext.stroke();
+  }
+};
+
+// const drawDraft = () => {
+//   offscreenContext.clearRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
+//   for (let i = 0; i < draftGeometries.length; i++) {
+//     drawGeometry(mapToPixel(draftGeometries[i]));
+//   }
+//   // console.log(dragStart, dragEnd);
+//   if (drawStart) {
+//     if (drawOperation.value === "LINESTRING") {
+//       if (draftCoordinates.length > 0) {
+//         offscreenContext.beginPath();
+//         let coord = mapToPixel(draftCoordinates[0]);
+//         offscreenContext.moveTo(coord[0], coord[1]);
+//         for (let i = 1; i < draftCoordinates.length; i++) {
+//           coord = mapToPixel(draftCoordinates[i]);
+//           offscreenContext.lineTo(coord[0], coord[1]);
+//         }
+//         coord = mapToPixel(draftMoveingCoordinate);
+//         offscreenContext.lineTo(coord[0], coord[1]);
+//         offscreenContext.strokeStyle = "white";
+//         offscreenContext.lineWidth = 4.0;
+//         offscreenContext.stroke();
+
+//         offscreenContext.strokeStyle = "black";
+//         offscreenContext.lineWidth = 1.0;
+//         offscreenContext.stroke();
+//       }
+//     } else if (drawOperation.value === "POLYGON") {
+//       if (draftCoordinates.length > 0) {
+//         offscreenContext.beginPath();
+//         let coord = mapToPixel(draftCoordinates[0]);
+//         let start = coord;
+//         offscreenContext.moveTo(coord[0], coord[1]);
+//         for (let i = 1; i < draftCoordinates.length; i++) {
+//           coord = mapToPixel(draftCoordinates[i]);
+//           offscreenContext.lineTo(coord[0], coord[1]);
+//         }
+//         coord = mapToPixel(draftMoveingCoordinate);
+//         offscreenContext.lineTo(coord[0], coord[1]);
+//         offscreenContext.lineTo(start[0], start[1]);
+
+//         offscreenContext.fillStyle = draftFillColor;
+//         offscreenContext.fill();
+
+//         offscreenContext.lineTo(coord[0], coord[1]);
+//         offscreenContext.strokeStyle = "white";
+//         offscreenContext.lineWidth = 4.0;
+//         offscreenContext.stroke();
+
+//         offscreenContext.strokeStyle = "black";
+//         offscreenContext.lineWidth = 1.0;
+//         offscreenContext.stroke();
+//       }
+//     }
+//   }
+//   const ctx = canvas.value.getContext("2d");
+//   ctx.clearRect(0, 0, canvas.value.width, canvas.value.height);
+//   ctx.drawImage(offscreenCanvas, 0, 0, canvas.value.width, canvas.value.height);
+// };
+
 const drawDraft = () => {
   offscreenContext.clearRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
-  for (let i = 0; i < draftGeometries.length; i++) {
-    drawGeometry(mapToPixel(draftGeometries[i]));
-  }
-  // console.log(dragStart, dragEnd);
+
+  draftGeometries.forEach((geo) => {
+    drawGeometry(mapToPixel(geo));
+  });
+
   if (drawStart) {
     if (drawOperation.value === "LINESTRING") {
-      if (draftCoordinates.length > 0) {
-        offscreenContext.beginPath();
-        let coord = mapToPixel(draftCoordinates[0]);
-        offscreenContext.moveTo(coord[0], coord[1]);
-        for (let i = 1; i < draftCoordinates.length; i++) {
-          coord = mapToPixel(draftCoordinates[i]);
-          offscreenContext.lineTo(coord[0], coord[1]);
-        }
-        coord = mapToPixel(draftMoveingCoordinate);
-        offscreenContext.lineTo(coord[0], coord[1]);
-        offscreenContext.stroke();
-      }
+      drawLineStringDraft();
+    } else if (drawOperation.value === "POLYGON") {
+      drawPolygonDraft();
     }
   }
+
   const ctx = canvas.value.getContext("2d");
   ctx.clearRect(0, 0, canvas.value.width, canvas.value.height);
   ctx.drawImage(offscreenCanvas, 0, 0, canvas.value.width, canvas.value.height);
 };
 
 const drawGeometry = (geo) => {
-  offscreenContext.lineWidth = 1.0;
-  offscreenContext.beginPath();
   if (geo instanceof Point) {
-    let coord = geo.getCoordinates();
-
-    offscreenContext.arc(coord[0], coord[1], 5, 0, 2 * Math.PI);
+    drawPoint(geo);
   } else if (geo instanceof LineString) {
-    let coords = geo.getCoordinates();
-    // console.log("coords: ", coords);
+    drawLineString(geo);
+  } else if (geo instanceof Polygon) {
+    drawPolygon(geo);
+  }
+};
+
+const drawPoint = (geo) => {
+  let coord = geo.getCoordinates();
+  offscreenContext.beginPath();
+  offscreenContext.arc(coord[0], coord[1], 5, 0, 2 * Math.PI);
+  offscreenContext.stroke();
+};
+
+const drawLineString = (geo) => {
+  offscreenContext.beginPath();
+  let coords = geo.getCoordinates();
+  if (coords.length >= 2) {
+    offscreenContext.moveTo(coords[0][0], coords[0][1]);
+    for (let i = 1; i < coords.length; i++) {
+      offscreenContext.lineTo(coords[i][0], coords[i][1]);
+    }
+  }
+  offscreenContext.strokeStyle = "white";
+  offscreenContext.lineWidth = 4.0;
+  offscreenContext.stroke();
+
+  offscreenContext.strokeStyle = "black";
+  offscreenContext.lineWidth = 1.0;
+  offscreenContext.stroke();
+  offscreenContext.stroke();
+};
+
+const drawPolygon = (geo) => {
+  offscreenContext.beginPath();
+  for (let i = 0; i < geo.getLinearRingCount(); i++) {
+    const lr = geo.getLinearRing(i);
+    let coords = lr.getCoordinates();
     if (coords.length >= 2) {
       offscreenContext.moveTo(coords[0][0], coords[0][1]);
-      for (let i = 1; i < coords.length; i++) {
-        offscreenContext.lineTo(coords[i][0], coords[i][1]);
+      for (let j = 1; j < coords.length; j++) {
+        offscreenContext.lineTo(coords[j][0], coords[j][1]);
       }
     }
   }
+
+  offscreenContext.fillStyle = draftFillColor;
+  offscreenContext.fill();
+
+  offscreenContext.strokeStyle = "white";
+  offscreenContext.lineWidth = 4.0;
+  offscreenContext.stroke();
+
+  offscreenContext.strokeStyle = "black";
+  offscreenContext.lineWidth = 1.0;
   offscreenContext.stroke();
 };
+
 onMounted(() => {
   setCenter(center.value);
   setScale(scale.value);
@@ -179,6 +326,7 @@ onMounted(() => {
   offscreenCanvas.height = canvas.value.height;
   offscreenContext = offscreenCanvas.getContext("2d");
 });
+
 onBeforeUnmount(() => {
   canvas.value.removeEventListener("wheel", onWheel);
   offscreenCanvas.remove();
@@ -233,107 +381,233 @@ const onWheel = throttle((e) => {
 const onResize = (size) => {
   canvas.value.width = size.width;
   canvas.value.height = size.height;
-  console.log("width:", canvas.value.width);
-  console.log("height:", canvas.value.height);
   if (offscreenCanvas) {
     offscreenCanvas.width = canvas.value.width;
     offscreenCanvas.height = canvas.value.height;
-    offscreenContext = offscreenCanvas.getContext("2d");
+    // offscreenContext = offscreenCanvas.getContext("2d");
     drawDraft();
   }
 };
 
+// const pixelToMap = (geo) => {
+//   if (geo instanceof Array) {
+//     let x = (geo[0] - canvas.value.width * 0.5) / scale.value + center.value[0];
+//     let y = center.value[1] - (geo[1] - canvas.value.height * 0.5) / scale.value;
+//     return [x, y];
+//   } else if (geo instanceof Point) {
+//     return new Point(pixelToMap(geo.getCoordinates()));
+//   } else if (geo instanceof LineString) {
+//     let coords = geo.getCoordinates();
+//     for (let i = 0; i < coords.length; i++) {
+//       coords[i] = pixelToMap(coords[i]);
+//     }
+//     return new LineString(coords);
+//   } else if (geo instanceof Polygon) {
+//     let coordarr = [];
+//     for (let i = 0; i < geo.getLinearRingCount(); i++) {
+//       let coords = geo.getLinearRing(i).getCoordinates();
+//       for (let j = 0; j < coords.length; j++) {
+//         coords[j] = pixelToMap(coords[j]);
+//       }
+//       coordarr.push(coords);
+//     }
+//     return new Polygon(coordarr);
+//   }
+// };
+
 const pixelToMap = (geo) => {
+  const transformCoord = (coord) => {
+    const halfWidth = canvas.value.width * 0.5;
+    const halfHeight = canvas.value.height * 0.5;
+    return [
+      (coord[0] - halfWidth) / scale.value + center.value[0],
+      center.value[1] - (coord[1] - halfHeight) / scale.value,
+    ];
+  };
+
   if (geo instanceof Array) {
-    let x = (geo[0] - canvas.value.width * 0.5) / scale.value + center.value[0];
-    let y = center.value[1] - (geo[1] - canvas.value.height * 0.5) / scale.value;
-    return [x, y];
+    return transformCoord(geo);
   } else if (geo instanceof Point) {
-    return new Point(pixelToMap(geo.getCoordinates()));
+    return new Point(transformCoord(geo.getCoordinates()));
   } else if (geo instanceof LineString) {
-    let coords = geo.getCoordinates();
-    for (let i = 0; i < coords.length; i++) {
-      coords[i] = pixelToMap(coords[i]);
-    }
-    return new LineString(coords);
+    return new LineString(geo.getCoordinates().map(transformCoord));
+  } else if (geo instanceof Polygon) {
+    return new Polygon(
+      geo.getLinearRings().map((lr) => lr.getCoordinates().map(transformCoord))
+    );
   }
 };
+
+// const mapToPixel = (geo) => {
+//   if (geo instanceof Array) {
+//     let x = canvas.value.width * 0.5 + (geo[0] - center.value[0]) * scale.value;
+//     let y = canvas.value.height * 0.5 - (geo[1] - center.value[1]) * scale.value;
+//     return [x, y];
+//   } else if (geo instanceof Point) {
+//     return new Point(mapToPixel(geo.getCoordinates()));
+//   } else if (geo instanceof LineString) {
+//     let coords = geo.getCoordinates();
+//     for (let i = 0; i < coords.length; i++) {
+//       coords[i] = mapToPixel(coords[i]);
+//     }
+//     return new LineString(coords);
+//   } else if (geo instanceof Polygon) {
+//     let coordarr = [];
+//     for (let i = 0; i < geo.getLinearRingCount(); i++) {
+//       let coords = geo.getLinearRing(i).getCoordinates();
+//       for (let j = 0; j < coords.length; j++) {
+//         coords[j] = mapToPixel(coords[j]);
+//       }
+//       coordarr.push(coords);
+//     }
+//     return new Polygon(coordarr);
+//   }
+// };
 
 const mapToPixel = (geo) => {
+  const transformCoord = (coord) => {
+    const halfWidth = canvas.value.width * 0.5;
+    const halfHeight = canvas.value.height * 0.5;
+    return [
+      halfWidth + (coord[0] - center.value[0]) * scale.value,
+      halfHeight - (coord[1] - center.value[1]) * scale.value,
+    ];
+  };
   if (geo instanceof Array) {
-    let x = canvas.value.width * 0.5 + (geo[0] - center.value[0]) * scale.value;
-    let y = canvas.value.height * 0.5 - (geo[1] - center.value[1]) * scale.value;
-    return [x, y];
+    return transformCoord(geo);
   } else if (geo instanceof Point) {
-    return new Point(mapToPixel(geo.getCoordinates()));
+    return new Point(transformCoord(geo.getCoordinates()));
   } else if (geo instanceof LineString) {
-    let coords = geo.getCoordinates();
-    for (let i = 0; i < coords.length; i++) {
-      coords[i] = mapToPixel(coords[i]);
-    }
-    return new LineString(coords);
+    return new LineString(geo.getCoordinates().map(transformCoord));
+  } else if (geo instanceof Polygon) {
+    return new Polygon(
+      geo.getLinearRings().map((lr) => lr.getCoordinates().map(transformCoord))
+    );
   }
 };
 
-const onMouseDown = (e) => {
-  let coord = pixelToMap([e.offsetX, e.offsetY]);
-
-  if (e.button === 0) {
-    if (drawOperation.value === "POINT") {
-      // draftGeometries.value.push(new Point(coord));
-    } else if (drawOperation.value === "LINESTRING") {
-      console.log("draw linestring");
-    } else if (drawOperation.value === "POLYGON") {
-      console.log("draw polygon");
-    }
-  }
-  coord[0];
+const onMouseDown = () => {
+  // let coord = pixelToMap([e.offsetX, e.offsetY]);
+  // if (e.button === 0) {
+  //   if (drawOperation.value === "POINT") {
+  //     // draftGeometries.value.push(new Point(coord));
+  //   } else if (drawOperation.value === "LINESTRING") {
+  //     console.log("draw linestring");
+  //   } else if (drawOperation.value === "POLYGON") {
+  //     console.log("draw polygon");
+  //   }
+  // }
 };
+
+// const onMouseUp = (e) => {
+//   let coord = pixelToMap([e.offsetX, e.offsetY]);
+//   if (e.button === 0) {
+//     // left button
+//     if (drawOperation.value === "POINT") {
+//       draftGeometries.push(new Point(coord));
+//     } else if (["LINESTRING", "POLYGON"].indexOf(drawOperation.value) >= 0) {
+//       if (!drawStart) {
+//         drawStart = true;
+//       }
+//       if (!isDragging) {
+//         draftCoordinates.push(coord);
+//         console.log("push", coord);
+//       }
+//     }
+//     drawDraft();
+//   } else if (e.button === 2) {
+//     // right button
+//     if (["LINESTRING", "POLYGON"].indexOf(drawOperation.value) >= 0) {
+//       drawStart = false;
+//       if (draftCoordinates.length >= 2 && drawOperation.value === "LINESTRING") {
+//         draftGeometries.push(new LineString(draftCoordinates));
+//       } else if (draftCoordinates.length >= 3 && drawOperation.value === "POLYGON") {
+//         console.log("draw end mouse up: ", draftCoordinates.length);
+//         draftCoordinates.push(draftCoordinates[0]);
+//         let lr = new LinearRing(draftCoordinates);
+//         // let coordarr = new Array();
+//         // for(let i=0; i<draftCoordinates.length; i++){
+//         //   coordarr.push(draftCoordinates[i]);
+//         // }
+//         // let lrarr = new Array();
+//         // lrarr.push
+//         draftGeometries.push(new Polygon([lr.getCoordinates()]));
+//       }
+//       drawDraft();
+//     }
+
+//     draftCoordinates.length = 0;
+//   }
+//   isDragging = false;
+// };
 
 const onMouseUp = (e) => {
   let coord = pixelToMap([e.offsetX, e.offsetY]);
+
   if (e.button === 0) {
+    // Left button
     if (drawOperation.value === "POINT") {
       draftGeometries.push(new Point(coord));
-    } else if (drawOperation.value === "LINESTRING") {
+    } else if (["LINESTRING", "POLYGON"].includes(drawOperation.value)) {
       if (!drawStart) {
         drawStart = true;
       }
       if (!isDragging) {
         draftCoordinates.push(coord);
+        console.log("push", coord);
       }
-    } else if (drawOperation.value === "POLYGON") {
-      console.log("draw polygon");
     }
-    drawDraft();
   } else if (e.button === 2) {
-    if (drawOperation.value === "LINESTRING") {
+    // Right button
+    if (["LINESTRING", "POLYGON"].includes(drawOperation.value)) {
       drawStart = false;
-      if (draftCoordinates.length >= 2) {
+      if (draftCoordinates.length >= 2 && drawOperation.value === "LINESTRING") {
         draftGeometries.push(new LineString(draftCoordinates));
+      } else if (draftCoordinates.length >= 3 && drawOperation.value === "POLYGON") {
+        console.log("draw end mouse up: ", draftCoordinates.length);
+        draftCoordinates.push(draftCoordinates[0]);
+        let lr = new LinearRing(draftCoordinates);
+        draftGeometries.push(new Polygon([lr.getCoordinates()]));
       }
-      drawDraft();
+      draftCoordinates.length = 0;
     }
-
-    draftCoordinates.length = 0;
   }
+
   isDragging = false;
+  drawDraft();
 };
 
+const onDragEnd = () => {
+  let xoff = dragEnd[0] - dragStart[0];
+  let yoff = dragEnd[1] - dragStart[1];
+  center.value[0] -= xoff;
+  center.value[1] -= yoff;
+  emits("mapViewChanged", {
+    zoom: [3857, 900913].includes(srid.value) ? zoom.value : false,
+    center: center.value,
+    scale: scale.value,
+  });
+  drawDraft();
+};
 const onMouseMove = (e) => {
   let coord = pixelToMap([e.offsetX, e.offsetY]);
   draftMoveingCoordinate = coord;
+
+  // dragging
   if (e.buttons === 1) {
-    // if (!isDragging) {
-    //   dragStart = dragEnd = coord;
-    // } else {
-    //   dragEnd = coord;
-    // }
+    if (!isDragging) {
+      dragStart = dragEnd = coord;
+    } else {
+      dragEnd = coord;
+      onDragEnd();
+    }
+
     isDragging = true;
-    console.log(e, isDragging);
-    drawDraft();
+  } else {
+    if (["LINESTRING", "POLYGON"].includes(drawOperation.value)) {
+      drawDraft();
+    }
   }
-  drawDraft();
 };
 
 defineExpose({

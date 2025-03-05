@@ -8,6 +8,9 @@ export const useAppConfig = defineStore('appconfig', {
         key: '',
         password: '',
       },
+      QQ: {
+        key: ' sssss',
+      },
       TianDiTu: {
         key: '',
       },
@@ -15,9 +18,6 @@ export const useAppConfig = defineStore('appconfig', {
         key: '',
       },
       Google: {
-        key: '',
-      },
-      QQ: {
         key: '',
       },
     },

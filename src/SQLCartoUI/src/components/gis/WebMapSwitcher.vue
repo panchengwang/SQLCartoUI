@@ -205,86 +205,123 @@ const webMaps = [
   },
 ];
 
+// const switchTo = (item) => {
+//   if (!beforeMapChanged.value()) {
+//     return;
+//   }
+//   if (currentWebMap.value.type === item.type) return;
+//   currentWebMap.value = item;
+//   labelVisible.value = true;
+//   if (item.type === "GAODE") {
+//     switchToGaoDe();
+//   } else if (item.type === "GOOGLE") {
+//     switchToGoogle();
+//   } else if (item.type === "BING") {
+//     switchToBing();
+//   } else if (item.type === "TIANDITU") {
+//     switchToTianDiTu();
+//   } else if (item.type === "QQ") {
+//     switchToQQ();
+//   } else {
+//     webMapControl.value.src = getWebMapUrl.value();
+//   }
+// };
+
+// const switchToGaoDe = () => {
+//   if (appConfig.getGaoDe.key.trim() === "" || appConfig.getGaoDe.password.trim() === "") {
+//     $q.notify({
+//       position: "top",
+//       type: "negative",
+//       message: "Please set key and password of gaode web map.",
+//     });
+//     return;
+//   }
+//   webMapControl.value.src = getWebMapUrl.value("GAODE"); // `/webmap/gaode.html?x=112.957273&y=28.199262&z=14&key=${appConfig.getGaoDe.key}&password=${appConfig.getGaoDe.password}`;
+// };
+
+// const switchToGoogle = () => {
+//   if (appConfig.getGoogle.key.trim() === "") {
+//     $q.notify({
+//       position: "top",
+//       type: "negative",
+//       message: "Please set key and password of google web map.",
+//     });
+//     return;
+//   }
+//   webMapControl.value.src = getWebMapUrl.value("GOOGLE"); // `/webmap/google.html?x=112.957273&y=28.199262&z=14&key=${appConfig.getGoogle.key}`;
+// };
+
+// const switchToBing = () => {
+//   if (appConfig.getBing.key.trim() === "") {
+//     $q.notify({
+//       position: "top",
+//       type: "negative",
+//       message: "Please set key and password of Bing web map.",
+//     });
+//     return;
+//   }
+//   webMapControl.value.src = getWebMapUrl.value("BING"); //`/webmap/bing.html?x=112.957273&y=28.199262&z=14&key=${appConfig.getBing.key}`;
+// };
+
+// const switchToQQ = () => {
+//   if (appConfig.getQQ.key.trim() === "") {
+//     $q.notify({
+//       position: "top",
+//       type: "negative",
+//       message: "Please set key  of QQ web map.",
+//     });
+//     return;
+//   }
+//   webMapControl.value.src = getWebMapUrl.value("QQ"); //`/webmap/tianditu.html?x=112.957273&y=28.199262&z=14&key=${appConfig.getTianDitu.key}`;
+// };
+
+// const switchToTianDiTu = () => {
+//   if (appConfig.getBing.key.trim() === "") {
+//     $q.notify({
+//       position: "top",
+//       type: "negative",
+//       message: "Please set key and password of TianDiTu web map.",
+//     });
+//     return;
+//   }
+//   webMapControl.value.src = getWebMapUrl.value("TIANDITU"); //`/webmap/tianditu.html?x=112.957273&y=28.199262&z=14&key=${appConfig.getTianDitu.key}`;
+// };
+
+const switchToMap = (type) => {
+  const configKey = {
+    GAODE: "getGaoDe",
+    GOOGLE: "getGoogle",
+    BING: "getBing",
+    TIANDITU: "getTianDitu",
+    QQ: "getQQ",
+  }[type];
+
+  if (!configKey || appConfig[configKey].key.trim() === "") {
+    $q.notify({
+      position: "top",
+      type: "negative",
+      message: `Please set key of ${type} web map.`,
+    });
+    return;
+  }
+
+  webMapControl.value.src = getWebMapUrl.value(type);
+};
+
 const switchTo = (item) => {
   if (!beforeMapChanged.value()) {
     return;
   }
   if (currentWebMap.value.type === item.type) return;
+
   currentWebMap.value = item;
   labelVisible.value = true;
-  if (item.type === "GAODE") {
-    switchToGaoDe();
-  } else if (item.type === "GOOGLE") {
-    switchToGoogle();
-  } else if (item.type === "BING") {
-    switchToBing();
-  } else if (item.type === "TIANDITU") {
-    switchToTianDiTu();
-  } else if (item.type === "QQ") {
-    switchToQQ();
+
+  if (["GAODE", "GOOGLE", "BING", "TIANDITU", "QQ"].includes(item.type)) {
+    switchToMap(item.type);
   } else {
     webMapControl.value.src = getWebMapUrl.value();
   }
-};
-
-const switchToGaoDe = () => {
-  if (appConfig.getGaoDe.key.trim() === "" || appConfig.getGaoDe.password.trim() === "") {
-    $q.notify({
-      position: "top",
-      type: "negative",
-      message: "Please set key and password of gaode web map.",
-    });
-    return;
-  }
-  webMapControl.value.src = getWebMapUrl.value("GAODE"); // `/webmap/gaode.html?x=112.957273&y=28.199262&z=14&key=${appConfig.getGaoDe.key}&password=${appConfig.getGaoDe.password}`;
-};
-
-const switchToGoogle = () => {
-  if (appConfig.getGoogle.key.trim() === "") {
-    $q.notify({
-      position: "top",
-      type: "negative",
-      message: "Please set key and password of google web map.",
-    });
-    return;
-  }
-  webMapControl.value.src = getWebMapUrl.value("GOOGLE"); // `/webmap/google.html?x=112.957273&y=28.199262&z=14&key=${appConfig.getGoogle.key}`;
-};
-
-const switchToBing = () => {
-  if (appConfig.getBing.key.trim() === "") {
-    $q.notify({
-      position: "top",
-      type: "negative",
-      message: "Please set key and password of Bing web map.",
-    });
-    return;
-  }
-  webMapControl.value.src = getWebMapUrl.value("BING"); //`/webmap/bing.html?x=112.957273&y=28.199262&z=14&key=${appConfig.getBing.key}`;
-};
-
-const switchToQQ = () => {
-  if (appConfig.getQQ.key.trim() === "") {
-    $q.notify({
-      position: "top",
-      type: "negative",
-      message: "Please set key  of QQ web map.",
-    });
-    return;
-  }
-  webMapControl.value.src = getWebMapUrl.value("QQ"); //`/webmap/tianditu.html?x=112.957273&y=28.199262&z=14&key=${appConfig.getTianDitu.key}`;
-};
-
-const switchToTianDiTu = () => {
-  if (appConfig.getBing.key.trim() === "") {
-    $q.notify({
-      position: "top",
-      type: "negative",
-      message: "Please set key and password of TianDiTu web map.",
-    });
-    return;
-  }
-  webMapControl.value.src = getWebMapUrl.value("TIANDITU"); //`/webmap/tianditu.html?x=112.957273&y=28.199262&z=14&key=${appConfig.getTianDitu.key}`;
 };
 
 const onShowWebMapSetting = () => {
