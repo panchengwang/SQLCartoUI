@@ -18,6 +18,12 @@ body {
   font-size: 12px !important;
 }
 
+::deep .q-tree__node-header {
+  padding: 0px;
+  margin-top: 3px;
+  border-radius: 4px;
+  outline: 0;
+}
 // #q-app > .q-layout{
 //     height: 100%;
 // }
@@ -25,3 +31,5 @@ body {
 // #q-app main{
 //     height:100%;
 // }
+
+@import './font-gis.css';

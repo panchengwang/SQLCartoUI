@@ -15,25 +15,23 @@
                 breakpoint="300"
               >
                 <q-tab name="SQLCarto" label="SQLCarto" no-caps style="flex-shrink: 0" />
-                <q-tab name="Database" label="Database" no-caps style="flex-shrink: 0" />
+                <!-- <q-tab name="Database" label="Database" no-caps style="flex-shrink: 0" /> -->
               </q-tabs>
 
               <q-separator />
 
-              <q-tab-panels
-                v-model="tab"
-                animated
-                class="bg-orange-1 text-dark text-center flex-fill-remaining"
-              >
-                <q-tab-panel name="SQLCarto">
-                  <div class="text-h6">Mails</div>
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
+              <q-tab-panels v-model="tab" animated class="flex-fill-remaining">
+                <q-tab-panel
+                  name="SQLCarto"
+                  style="padding-top: 1px; padding-left: 0px; padding-right: 0px"
+                >
+                  <CatalogTree class="full-height full-width"></CatalogTree>
                 </q-tab-panel>
 
-                <q-tab-panel name="Database" class="bg-grey-9 text-white">
+                <!-- <q-tab-panel name="Database" class="bg-grey-9 text-white">
                   <div class="text-h6">Alarms</div>
                   Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                </q-tab-panel>
+                </q-tab-panel> -->
               </q-tab-panels>
             </q-card>
           </div>
@@ -52,6 +50,7 @@
 </template>
 
 <script setup>
+import CatalogTree from "src/components/gis/CatalogTree.vue";
 import MapControl from "src/components/gis/MapControl.vue";
 import { ref } from "vue";
 
