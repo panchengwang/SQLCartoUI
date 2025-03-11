@@ -7,44 +7,83 @@ class SQLCartoDatabase {
     this.masterUrl = this.appConfig.$state.masterUrl
     this.nodeUrl = this.appConfig.$state.nodeUrl
   }
-
-  postToMaster(requestData, callback) {
+  async postToMaster(requestData, callback) {
     const formData = new FormData()
     formData.append('request', JSON.stringify(requestData))
-    axios.post(this.masterUrl, formData).then((response) => {
-      if (callback) {
+    try {
+      const response = await axios.post(this.masterUrl, formData)
+      if (callback && response.data) {
         callback(response.data)
       }
-    })
+    } catch (error) {
+      if (callback) {
+        callback({
+          success: false,
+          message: 'Network error. ',
+          data: null,
+        })
+      } else {
+        console.log(error)
+      }
+    }
   }
-
-  postToNode(requestData, callback) {
+  // postToMaster(requestData, callback) {
+  //   const formData = new FormData()
+  //   formData.append('request', JSON.stringify(requestData))
+  //   axios.post(this.masterUrl, formData).then((response) => {
+  //     if (callback) {
+  //       callback(response.data)
+  //     }
+  //   })
+  // }
+  async postToNode(requestData, callback) {
     const formData = new FormData()
     formData.append('request', JSON.stringify(requestData))
-    axios.post(this.nodeUrl, formData).then((response) => {
-      if (callback) {
+    try {
+      const response = await axios.post(this.nodeUrl, formData)
+      if (callback && response.data) {
         callback(response.data)
       }
-    })
+    } catch (error) {
+      if (callback) {
+        callback({
+          success: false,
+          message: 'Network error. ',
+          data: null,
+        })
+      } else {
+        console.log(error)
+      }
+    }
   }
+  // postToNode(requestData, callback) {
+  //   const formData = new FormData()
+  //   formData.append('request', JSON.stringify(requestData))
+  //   axios.post(this.nodeUrl, formData).then((response) => {
+  //     if (callback) {
+  //       callback(response.data)
+  //     }
+  //   })
+  // }
 
   userIfAvailable(username, callback) {
     this.postToMaster(
       {
         type: 'USER_IF_AVAILABLE',
         data: {
-          username: username,
+          username,
         },
       },
       callback,
     )
   }
+
   userGetCaptcha(username, callback) {
     this.postToMaster(
       {
         type: 'USER_GET_CAPTCHA',
         data: {
-          username: username,
+          username,
         },
       },
       callback,

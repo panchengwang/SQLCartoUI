@@ -88,9 +88,9 @@
       <router-view />
     </q-page-container>
 
-    <q-footer bordered class="bg-grey-2 text-grey-9">
+    <!-- <q-footer bordered class="bg-grey-2 text-grey-9">
       <q-toolbar style="min-height: 32px"> </q-toolbar>
-    </q-footer>
+    </q-footer> -->
   </q-layout>
 </template>
 

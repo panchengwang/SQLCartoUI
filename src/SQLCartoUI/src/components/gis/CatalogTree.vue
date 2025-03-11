@@ -22,37 +22,50 @@
           <q-icon dense :name="getIcon(prop.node.type)" color="text-primary" size="sm" />
           <div class="q-pl-sm">{{ prop.node.name }}</div>
         </div>
-        <q-menu context-menu>
+
+        <q-menu
+          context-menu
+          id="groupmenu"
+          v-if="['ROOT', 'FOLDER'].includes(prop.node.type)"
+        >
           <q-list dense style="width: 200px">
-            <q-item
-              clickable
-              v-close-popup
-              v-if="['ROOT', 'FOLDER'].includes(prop.node.type)"
-            >
+            <q-item clickable v-close-popup @click="onNewSpatialLayer">
               <q-item-section side>
-                <q-icon name="fg-layer-alt-add-o" class="text-primary" />
+                <q-icon name="fg-layer-alt-add-o" class="text-primary" size="xs" />
               </q-item-section>
               <q-item-section>New Spatial Layer</q-item-section>
             </q-item>
-            <q-item
-              clickable
-              v-close-popup
-              v-if="['ROOT', 'FOLDER'].includes(prop.node.type)"
-            >
-              <q-item-section>Submenu Label</q-item-section>
+            <q-item clickable v-close-popup>
               <q-item-section side>
-                <q-icon name="keyboard_arrow_right" />
+                <q-icon name="bi-table" class="text-primary" size="xs" />
               </q-item-section>
+              <q-item-section>New Table</q-item-section>
+            </q-item>
+            <q-item clickable v-close-popup>
+              <q-item-section side>
+                <q-icon name="bi-folder-plus" class="text-primary" size="xs" />
+              </q-item-section>
+              <q-item-section>New Folder</q-item-section>
+            </q-item>
+            <q-separator />
+            <q-item clickable v-close-popup v-if="prop.node.type === 'FOLDER'">
+              <q-item-section side>
+                <q-icon name="bi-folder-minus" class="text-primary" size="xs" />
+              </q-item-section>
+              <q-item-section>Delete</q-item-section>
             </q-item>
           </q-list>
         </q-menu>
       </template>
     </q-tree>
+
+    <AdvanceDialog v-if="dialogVisible" v-model="dialogVisible"></AdvanceDialog>
   </div>
 </template>
 
 <script setup>
 import { onMounted, ref } from "vue";
+import AdvanceDialog from "../dialog/AdvanceDialog.vue";
 
 const expanded = ref([0]);
 const selected = ref(null);
@@ -62,34 +75,8 @@ const catalogData = ref([
   {
     id: 0,
     name: "SQLCarto DB",
-    icon: "img:/icons/logo.svg",
     type: "ROOT",
-    children: [
-      {
-        id: 1,
-        name: "Tables",
-        icon: "table_view",
-        type: "TABLE",
-      },
-      {
-        id: 2,
-        name: "Point",
-        icon: "fg-point",
-        type: "POINT",
-      },
-      {
-        id: 3,
-        name: "LineString",
-        icon: "fg-polyline",
-        type: "LINESTRING",
-      },
-      {
-        id: 4,
-        name: "polygon",
-        icon: "fg-polygon",
-        type: "POLYGON",
-      },
-    ],
+    children: [],
   },
 ]);
 
@@ -100,7 +87,7 @@ const getIcon = (type) => {
     case "ROOT":
       return "img:/icons/logo.svg";
     case "FOLDER":
-      return "folder";
+      return "o_folder";
     case "TABLE":
       return "table_view";
     case "POINT":
@@ -121,6 +108,11 @@ const onSelected = (val) => {
 const onContextMenu = (event, node) => {
   currentNode.value = node;
   selected.value = node.id;
+};
+
+const dialogVisible = ref(false);
+const onNewSpatialLayer = () => {
+  dialogVisible.value = true;
 };
 </script>
 

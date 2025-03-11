@@ -32,4 +32,13 @@ body {
 //     height:100%;
 // }
 
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-fill-remaining {
+  flex-grow: 1;
+}
+
 @import './font-gis.css';

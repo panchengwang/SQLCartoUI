@@ -2,9 +2,9 @@
   <q-page class="full-width full-height bg-blue-3">
     <div class="absolute row justify-center no-wrap full-width full-height q-gutter-md">
       <div class="col-1"></div>
-      <div class="div-with-bg col"></div>
-      <div class="div-with-bg col"></div>
-      <div class="div-with-bg col"></div>
+      <div class="div-with-bg-logo col"></div>
+      <div class="div-with-bg-logo col"></div>
+      <div class="div-with-bg-logo col"></div>
       <div class="col-1"></div>
     </div>
     <div class="absolute full-height full-width q-gutter-md flex flex-center">
@@ -95,13 +95,13 @@ const onResetPassword = () => {
 </script>
 
 <style scoped>
-.div-with-bg {
+.div-with-bg-logo {
   width: 100px;
   aspect-ratio: 1 / 1;
   background-image: url("/icons/logo.svg"); /* 替换为你的图片URL */
   background-position: center; /* 居中显示背景图片 */
   background-repeat: no-repeat;
   background-size: calc(100% * 0.8);
-  opacity: 1;
+  opacity: 0.5;
 }
 </style>
