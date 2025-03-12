@@ -10,7 +10,6 @@ $q.iconMapFn = (iconName) => {
 
   // can be any logic you want, but for this example:
   if (iconName.startsWith("fg-") === true) {
-    console.log("fg-icon: ", iconName);
     return { cls: iconName };
   }
 

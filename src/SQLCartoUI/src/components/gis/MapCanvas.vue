@@ -1,5 +1,5 @@
 <template>
-  <div :id="mapId">
+  <div :id="mapId" class="no-select">
     <canvas ref="canvas" class="full-width full-height"></canvas>
     <q-resize-observer @resize="onResize" />
   </div>
@@ -486,60 +486,7 @@ const mapToPixel = (geo) => {
   }
 };
 
-const onMouseDown = () => {
-  // let coord = pixelToMap([e.offsetX, e.offsetY]);
-  // if (e.button === 0) {
-  //   if (drawOperation.value === "POINT") {
-  //     // draftGeometries.value.push(new Point(coord));
-  //   } else if (drawOperation.value === "LINESTRING") {
-  //     console.log("draw linestring");
-  //   } else if (drawOperation.value === "POLYGON") {
-  //     console.log("draw polygon");
-  //   }
-  // }
-};
-
-// const onMouseUp = (e) => {
-//   let coord = pixelToMap([e.offsetX, e.offsetY]);
-//   if (e.button === 0) {
-//     // left button
-//     if (drawOperation.value === "POINT") {
-//       draftGeometries.push(new Point(coord));
-//     } else if (["LINESTRING", "POLYGON"].indexOf(drawOperation.value) >= 0) {
-//       if (!drawStart) {
-//         drawStart = true;
-//       }
-//       if (!isDragging) {
-//         draftCoordinates.push(coord);
-//         console.log("push", coord);
-//       }
-//     }
-//     drawDraft();
-//   } else if (e.button === 2) {
-//     // right button
-//     if (["LINESTRING", "POLYGON"].indexOf(drawOperation.value) >= 0) {
-//       drawStart = false;
-//       if (draftCoordinates.length >= 2 && drawOperation.value === "LINESTRING") {
-//         draftGeometries.push(new LineString(draftCoordinates));
-//       } else if (draftCoordinates.length >= 3 && drawOperation.value === "POLYGON") {
-//         console.log("draw end mouse up: ", draftCoordinates.length);
-//         draftCoordinates.push(draftCoordinates[0]);
-//         let lr = new LinearRing(draftCoordinates);
-//         // let coordarr = new Array();
-//         // for(let i=0; i<draftCoordinates.length; i++){
-//         //   coordarr.push(draftCoordinates[i]);
-//         // }
-//         // let lrarr = new Array();
-//         // lrarr.push
-//         draftGeometries.push(new Polygon([lr.getCoordinates()]));
-//       }
-//       drawDraft();
-//     }
-
-//     draftCoordinates.length = 0;
-//   }
-//   isDragging = false;
-// };
+const onMouseDown = () => {};
 
 const onMouseUp = (e) => {
   let coord = pixelToMap([e.offsetX, e.offsetY]);
@@ -626,3 +573,23 @@ defineExpose({
   mapToPixel,
 });
 </script>
+
+<style scoped>
+.no-select {
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* 标准语法 */
+}
+
+.custom-select::selection {
+  background-color: transparent; /* 设置选中背景颜色为透明 */
+  color: inherit; /* 保持文本颜色不变 */
+}
+
+.custom-select::-moz-selection {
+  /* Firefox 需要单独处理 */
+  background-color: transparent;
+  color: inherit;
+}
+</style>

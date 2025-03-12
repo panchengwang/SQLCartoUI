@@ -59,13 +59,17 @@
       </template>
     </q-tree>
 
-    <AdvanceDialog v-if="dialogVisible" v-model="dialogVisible"></AdvanceDialog>
+    <DragableResizableWindow
+      v-if="dialogVisible"
+      v-model="dialogVisible"
+      :modal="true"
+    ></DragableResizableWindow>
   </div>
 </template>
 
 <script setup>
 import { onMounted, ref } from "vue";
-import AdvanceDialog from "../dialog/AdvanceDialog.vue";
+import DragableResizableWindow from "../dialog/DragableResizableWindow.vue";
 
 const expanded = ref([0]);
 const selected = ref(null);

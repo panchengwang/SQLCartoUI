@@ -16,12 +16,12 @@
           dense
           flat
           color="white"
-          :label="appConfig.$state.username.trim()"
+          :label="configuration.$state.username.trim()"
           icon="account_circle"
           no-caps
           v-show="
-            appConfig.$state.token.trim() !== '' &&
-            appConfig.$state.username.trim() !== ''
+            configuration.$state.token.trim() !== '' &&
+            configuration.$state.username.trim() !== ''
           "
         >
           <div class="row no-wrap q-pa-md" style="z-index: 1000">
@@ -39,7 +39,7 @@
               </q-avatar>
 
               <div class="text-subtitle1 q-mt-md q-mb-xs">
-                {{ appConfig.$state.username.trim() }}
+                {{ configuration.$state.username.trim() }}
               </div>
 
               <q-btn
@@ -60,11 +60,11 @@
           color="white"
           icon="account_circle"
           size="md"
-          :label="appConfig.$state.username.trim()"
+          :label="configuration.$state.username.trim()"
           no-caps
           v-show="
-            appConfig.$state.token.trim() !== '' &&
-            appConfig.$state.username.trim() !== ''
+            configuration.$state.token.trim() !== '' &&
+            configuration.$state.username.trim() !== ''
           "
         >
           <q-list>
@@ -95,21 +95,21 @@
 </template>
 
 <script setup>
-import { useAppConfig } from "src/stores/ApplicationConfiguration";
+import { useConfiguration } from "src/stores/Configuration";
 import { onMounted } from "vue";
 import { useRouter } from "vue-router";
 
-const appConfig = useAppConfig();
+const configuration = useConfiguration();
 const router = useRouter();
 
 onMounted(() => {
-  if (appConfig.hasLogin) {
+  if (configuration.hasLogin) {
     router.replace({ name: "application" });
   }
 });
 
 const onLogout = () => {
-  appConfig.setAccountInformation("", "");
+  configuration.setAccountInformation("", "");
   router.replace({ name: "login" });
 };
 </script>

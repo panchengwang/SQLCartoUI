@@ -1,17 +1,13 @@
 <template>
   <div ref="dialog">
     <div
-      :style="{ zIndex: zIndex }"
+      :style="{
+        zIndex: zIndex,
+        backgroundColor: props.modal ? 'rgba(0, 0, 0, 0.2)' : 'transparent',
+      }"
       :id="backgroundId"
-      style="
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: 0;
-        bottom: 0;
-        background-color: transparent;
-      "
-      v-show="isResizing || isDragging"
+      style="position: absolute; left: 0; right: 0; top: 0; bottom: 0"
+      v-show="props.modal || isResizing || isDragging"
     ></div>
     <div
       v-show="props.modelValue"
@@ -22,14 +18,14 @@
         width: `${size.width}px`,
         height: `${size.height}px`,
         backgroundColor: 'rgba(255, 255, 255, 0)',
-        zIndex: zIndex + 1,
+        zIndex: zIndex,
       }"
     >
       <q-card class="flex-column fit q-pa-none">
         <q-card-section dense class="q-ma-none q-pa-none">
           <q-toolbar
             dense
-            class="bg-primary text-white"
+            class="bg-indigo-9 text-white"
             style="border-top-left-radius: 4px; border-top-right-radius: 4px"
             @dblclick="toggleMaximize()"
             @mousedown.stop="startDrag"
@@ -62,7 +58,7 @@
             </div>
           </q-toolbar>
         </q-card-section>
-        <q-card-section class="flex-fill-remaining">
+        <q-card-section class="flex-fill-remaining q-pa-none">
           <slot></slot>
         </q-card-section>
       </q-card>
@@ -80,7 +76,7 @@
 
 <script setup>
 import { useId } from "quasar";
-import { onMounted, onBeforeUnmount, onUnmounted } from "vue";
+import { onMounted, onBeforeUnmount, watch } from "vue";
 
 import { ref } from "vue";
 const backgroundId = useId();
@@ -96,6 +92,7 @@ const props = defineProps({
   height: { type: Number, default: 300 },
   minWidth: { type: Number, default: 200 },
   minHeight: { type: Number, default: 200 },
+  modal: { type: Boolean, default: false },
 });
 const emits = defineEmits(["update:modelValue"]);
 
@@ -115,8 +112,7 @@ const containerEl = ref(null);
 const isMaximized = ref(false);
 const isResizing = ref(false);
 const isDragging = ref(false);
-
-const zIndex = ref(10000);
+const zIndex = ref(100);
 const size = ref({ width: props.width, height: props.height });
 const position = ref({ x: 50, y: 50 });
 const initialValues = ref({ size: null, position: null });
@@ -136,7 +132,14 @@ const updateContainerRect = () => {
 
 onMounted(() => {
   containerEl.value = document.querySelector(props.container);
+  if (!containerEl.value.maxZIndex) {
+    containerEl.value.maxZIndex = 1;
+  }
+  if (containerEl.value === document.body) {
+    containerEl.value.maxZIndex = 10000;
+  }
   containerEl.value.appendChild(dialog.value);
+  zIndex.value = containerEl.value.maxZIndex++;
   updateContainerRect();
   position.value = {
     x: (containerRect.value.width - size.value.width) / 2,
@@ -148,11 +151,30 @@ onMounted(() => {
   };
 
   window.addEventListener("resize", updateContainerRect);
+  dialog.value.addEventListener("click", activate);
 });
 
-onUnmounted(() => {
-  window.removeEventListener("resize", updateContainerRect);
-});
+const activate = () => {
+  // console.log(getMaxIndexOfChildren(containerEl.value));
+  if (zIndex.value === containerEl.value.maxZIndex) {
+    return;
+  }
+  zIndex.value = containerEl.value.maxZIndex++;
+};
+
+// const getMaxIndexOfChildren = (parent) => {
+//   let maxZIndex = 0;
+//   for (let i = 0; i < parent.children.length; i++) {
+//     const child = parent.children[i];
+//     const computedStyle = window.getComputedStyle(child);
+//     const zIndex = parseInt(computedStyle.zIndex, 10);
+
+//     if (!isNaN(zIndex) && zIndex > maxZIndex) {
+//       maxZIndex = zIndex;
+//     }
+//   }
+//   return maxZIndex;
+// };
 
 const toggleMaximize = () => {
   if (isMaximized.value) {
@@ -174,8 +196,17 @@ const toggleMaximize = () => {
 
 onBeforeUnmount(() => {
   window.removeEventListener("resize", updateContainerRect);
+  dialog.value.removeEventListener("click", activate);
 });
 
+watch(
+  () => props.modelValue,
+  (newVal) => {
+    if (newVal) {
+      activate();
+    }
+  }
+);
 const onClose = () => {
   emits("update:modelValue", false);
 };
@@ -184,7 +215,7 @@ const startResize = (directions, e) => {
   e.preventDefault();
   if (isMaximized.value) return;
   isResizing.value = true;
-
+  activate();
   const startX = e.clientX;
   const startY = e.clientY;
   const initialSize = { ...size.value };
@@ -247,7 +278,7 @@ const startResize = (directions, e) => {
 const startDrag = (e) => {
   if (isResizing.value) return;
   isDragging.value = true;
-
+  activate();
   const startX = e.clientX;
   const startY = e.clientY;
   const initialPosition = { ...position.value };
@@ -283,6 +314,10 @@ const startDrag = (e) => {
   containerEl.value.addEventListener("mousemove", handleDrag);
   containerEl.value.addEventListener("mouseup", stopDrag);
 };
+
+defineExpose({
+  activate,
+});
 </script>
 
 <style scoped>

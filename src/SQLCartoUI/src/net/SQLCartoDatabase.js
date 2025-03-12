@@ -1,9 +1,9 @@
-import { useAppConfig } from 'src/stores/ApplicationConfiguration'
+import { useConfiguration } from 'src/stores/Configuration'
 import axios from 'axios'
 
 class SQLCartoDatabase {
   constructor() {
-    this.appConfig = useAppConfig()
+    this.appConfig = useConfiguration()
     this.masterUrl = this.appConfig.$state.masterUrl
     this.nodeUrl = this.appConfig.$state.nodeUrl
   }

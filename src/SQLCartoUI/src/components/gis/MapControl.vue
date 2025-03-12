@@ -5,15 +5,17 @@
       class="absolute full-width full-height"
       ref="webMapControl"
     ></iframe>
+
     <MapCanvas
       class="absolute full-width full-height q-pa-none no-scroll"
       ref="mapCanvas"
       @contextmenu.prevent="null"
       @mapViewChanged="onMapViewChanged"
     ></MapCanvas>
+
     <WebMapSwitcher
       class="absolute"
-      style="right: 10px; top: 10px; width: 200px"
+      style="right: 10px; top: 10px; width: 200px; z-index: 100"
       v-show="srid === 3857 || srid === 900913"
       :web-map-control="webMapControl"
       :before-map-changed="onBeforeWebMapChanged"
@@ -26,15 +28,15 @@
 import MapCanvas from "./MapCanvas.vue";
 // import { useId } from "quasar";
 import { onMounted, ref } from "vue";
-// import { useAppConfig } from "src/stores/useAppConfig.js";
+// import { useConfiguration } from "src/stores/useconfiguration.js";
 import WebMapSwitcher from "./WebMapSwitcher.vue";
-import { useAppConfig } from "src/stores/ApplicationConfiguration";
+import { useConfiguration } from "src/stores/Configuration";
 import { transform } from "ol/proj";
 import getDPI from "src/utils/getDPI";
 // const mapid = useId();
 const mapCanvas = ref(null);
 const webMapControl = ref(null);
-const appConfig = useAppConfig();
+const configuration = useConfiguration();
 
 const center = ref(transform([112.957273, 28.199262], "EPSG:4326", "EPSG:3857"));
 const srid = ref(3857);
@@ -57,15 +59,15 @@ const onBeforeWebMapChanged = () => {
 const onGetWebMapUrl = (type) => {
   const cpt = transform(center.value, `EPSG:${srid.value}`, `EPSG:4326`);
   if (type === "GAODE") {
-    return `/webmap/gaode.html?x=${cpt[0]}&y=${cpt[1]}&z=${zoom.value}&key=${appConfig.getGaoDe.key}&password=${appConfig.getGaoDe.password}`;
+    return `/webmap/gaode.html?x=${cpt[0]}&y=${cpt[1]}&z=${zoom.value}&key=${configuration.getGaoDe.key}&password=${configuration.getGaoDe.password}`;
   } else if (type === "GOOGLE") {
-    return `/webmap/google.html?x=${cpt[0]}&y=${cpt[1]}&z=${zoom.value}&key=${appConfig.getGoogle.key}`;
+    return `/webmap/google.html?x=${cpt[0]}&y=${cpt[1]}&z=${zoom.value}&key=${configuration.getGoogle.key}`;
   } else if (type === "BING") {
-    return `/webmap/bing.html?x=${cpt[0]}&y=${cpt[1]}&z=${zoom.value}&key=${appConfig.getBing.key}`;
+    return `/webmap/bing.html?x=${cpt[0]}&y=${cpt[1]}&z=${zoom.value}&key=${configuration.getBing.key}`;
   } else if (type === "TIANDITU") {
-    return `/webmap/tianditu.html?x=${cpt[0]}&y=${cpt[1]}&z=${zoom.value}&key=${appConfig.getTianDitu.key}`;
+    return `/webmap/tianditu.html?x=${cpt[0]}&y=${cpt[1]}&z=${zoom.value}&key=${configuration.getTianDitu.key}`;
   } else if (type === "QQ") {
-    return `/webmap/qq.html?x=${cpt[0]}&y=${cpt[1]}&z=${zoom.value}&key=${appConfig.getQQ.key}`;
+    return `/webmap/qq.html?x=${cpt[0]}&y=${cpt[1]}&z=${zoom.value}&key=${configuration.getQQ.key}`;
   }
 
   return `/webmap/nomap.html`;
@@ -80,3 +82,23 @@ const onMapViewChanged = (view) => {
   }
 };
 </script>
+
+<style scoped>
+.no-select {
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* 标准语法 */
+}
+
+.custom-select::selection {
+  background-color: transparent; /* 设置选中背景颜色为透明 */
+  color: inherit; /* 保持文本颜色不变 */
+}
+
+.custom-select::-moz-selection {
+  /* Firefox 需要单独处理 */
+  background-color: transparent;
+  color: inherit;
+}
+</style>

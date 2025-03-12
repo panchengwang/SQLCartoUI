@@ -1,7 +1,7 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import SQLCartoDatabase from 'src/net/SQLCartoDatabase'
 
-export const useAppConfig = defineStore('appconfig', {
+export const useConfiguration = defineStore('configuration', {
   state: () => ({
     webMapKeys: {
       GaoDe: {
@@ -87,5 +87,5 @@ export const useAppConfig = defineStore('appconfig', {
 })
 
 if (import.meta.hot) {
-  import.meta.hot.accept(acceptHMRUpdate(useAppConfig, import.meta.hot))
+  import.meta.hot.accept(acceptHMRUpdate(useConfiguration, import.meta.hot))
 }

@@ -1,11 +1,14 @@
 <template>
   <q-page class="full-width full-height bg-blue-3">
-    <div class="absolute row justify-center no-wrap full-width full-height q-gutter-md">
-      <div class="col-1"></div>
+    <div
+      class="absolute row justify-center no-wrap full-width full-height q-gutter-md bg-indigo-1"
+    >
+      <!-- <div class="col-1"></div>
       <div class="div-with-bg-logo col"></div>
       <div class="div-with-bg-logo col"></div>
       <div class="div-with-bg-logo col"></div>
-      <div class="col-1"></div>
+      <div class="col-1"></div> -->
+      <div class="div-with-bg-logo absolute full-width full-height"></div>
     </div>
     <div class="absolute full-height full-width q-gutter-md flex flex-center">
       <q-card style="min-width: 500px; width: 30%; margin-top: -100px">
@@ -40,13 +43,13 @@
 <script setup>
 import { ref } from "vue";
 import InputPassword from "src/components/form/InputPassword.vue";
-import { useAppConfig } from "src/stores/ApplicationConfiguration";
+import { useConfiguration } from "src/stores/Configuration";
 import { useRouter } from "vue-router";
 import SQLCartoDatabase from "src/net/SQLCartoDatabase";
 import { useQuasar } from "quasar";
 
 const $q = useQuasar();
-const appConfig = useAppConfig();
+const configuration = useConfiguration();
 const router = useRouter();
 const username = ref("wang_wang_lao@163.com");
 const password = ref("@Ww111111");
@@ -59,11 +62,11 @@ const onLogin = () => {
     },
     (response) => {
       if (response.success) {
-        appConfig.$state.nodeUrl = response.data.node_url;
-        appConfig.$state.token = response.data.token;
-        appConfig.$state.username = username.value.trim();
+        configuration.$state.nodeUrl = response.data.node_url;
+        configuration.$state.token = response.data.token;
+        configuration.$state.username = username.value.trim();
         router.replace({ name: "application" });
-        appConfig.loadWebMapKeys();
+        configuration.loadWebMapKeys();
       } else {
         $q.notify({
           message: response.message,
@@ -73,7 +76,7 @@ const onLogin = () => {
       }
     }
   );
-  // appConfig.setAccountInformation("pcwang", "sdfasdfs");
+  // configuration.setAccountInformation("pcwang", "sdfasdfs");
   // router.replace({ name: "application" });
 };
 
@@ -101,7 +104,7 @@ const onResetPassword = () => {
   background-image: url("/icons/logo.svg"); /* 替换为你的图片URL */
   background-position: center; /* 居中显示背景图片 */
   background-repeat: no-repeat;
-  background-size: calc(100% * 0.8);
-  opacity: 0.5;
+  background-size: calc(100% * 0.6) calc(100% * 0.6);
+  opacity: 0.9;
 }
 </style>

@@ -8,7 +8,7 @@
           outlined
           dense
           label="key"
-          v-model="appConfig.$state.webMapKeys.GaoDe.key"
+          v-model="configuration.$state.webMapKeys.GaoDe.key"
           :rules="[true]"
         ></InputPassword>
 
@@ -16,7 +16,7 @@
           outlined
           dense
           label="password"
-          v-model="appConfig.$state.webMapKeys.GaoDe.password"
+          v-model="configuration.$state.webMapKeys.GaoDe.password"
           :rules="[true]"
         ></InputPassword>
 
@@ -26,7 +26,7 @@
           outlined
           dense
           label="key"
-          v-model="appConfig.$state.webMapKeys.QQ.key"
+          v-model="configuration.$state.webMapKeys.QQ.key"
           :rules="[true]"
         ></InputPassword>
         <label>Google:</label>
@@ -35,7 +35,7 @@
           outlined
           dense
           label="key"
-          v-model="appConfig.$state.webMapKeys.Google.key"
+          v-model="configuration.$state.webMapKeys.Google.key"
           :rules="[true]"
         ></InputPassword>
         <label>Bing:</label>
@@ -44,7 +44,7 @@
           outlined
           dense
           label="key"
-          v-model="appConfig.$state.webMapKeys.Bing.key"
+          v-model="configuration.$state.webMapKeys.Bing.key"
           :rules="[true]"
         ></InputPassword>
         <label>TianDiTu:</label>
@@ -53,7 +53,7 @@
           outlined
           dense
           label="key"
-          v-model="appConfig.$state.webMapKeys.TianDiTu.key"
+          v-model="configuration.$state.webMapKeys.TianDiTu.key"
           :rules="[true]"
         ></InputPassword>
       </q-form>
@@ -62,27 +62,27 @@
 </template>
 
 <script setup>
-import { useAppConfig } from "src/stores/ApplicationConfiguration";
+import { useConfiguration } from "src/stores/Configuration";
 import ResizeableDialog from "src/components/dialog/ResizeableDialog.vue";
 import InputPassword from "../form/InputPassword.vue";
 import SQLCartoDatabase from "src/net/SQLCartoDatabase";
 import { useQuasar } from "quasar";
-const appConfig = useAppConfig();
+const configuration = useConfiguration();
 const $q = useQuasar();
 
 const onAccept = () => {
   const db = new SQLCartoDatabase();
   db.userSaveWebMapKeys(
     {
-      username: appConfig.$state.username,
-      token: appConfig.$state.token,
+      username: configuration.$state.username,
+      token: configuration.$state.token,
       webmapkeys: {
-        gaode_key: appConfig.webMapKeys.GaoDe.key,
-        gaode_password: appConfig.$state.webMapKeys.GaoDe.password,
-        bing_key: appConfig.$state.webMapKeys.Bing.key,
-        google_key: appConfig.$state.webMapKeys.Google.key,
-        tianditu_key: appConfig.$state.webMapKeys.TianDiTu.key,
-        qq_key: appConfig.$state.webMapKeys.QQ.key,
+        gaode_key: configuration.webMapKeys.GaoDe.key,
+        gaode_password: configuration.$state.webMapKeys.GaoDe.password,
+        bing_key: configuration.$state.webMapKeys.Bing.key,
+        google_key: configuration.$state.webMapKeys.Google.key,
+        tianditu_key: configuration.$state.webMapKeys.TianDiTu.key,
+        qq_key: configuration.$state.webMapKeys.QQ.key,
       },
     },
     (response) => {
