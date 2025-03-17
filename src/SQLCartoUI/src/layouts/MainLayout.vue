@@ -1,6 +1,6 @@
 <template>
   <q-layout view="hHh lpR fFf" class="full-height">
-    <q-header bordered height-hint="32px">
+    <!-- <q-header bordered height-hint="32px">
       <q-toolbar style="min-height: 36px">
         <q-btn
           size="sm"
@@ -54,33 +54,9 @@
             </div>
           </div>
         </q-btn-dropdown>
-        <!-- <q-btn-dropdown
-          dense
-          flat
-          color="white"
-          icon="account_circle"
-          size="md"
-          :label="configuration.$state.username.trim()"
-          no-caps
-          v-show="
-            configuration.$state.token.trim() !== '' &&
-            configuration.$state.username.trim() !== ''
-          "
-        >
-          <q-list>
-            <q-item v-ripple clickable v-close-popup>
-              <q-item-section avatar>
-                <q-avatar icon="check" size="md"> </q-avatar>
-              </q-item-section>
-              <q-item-section>
-                <q-item-label>asfsf</q-item-label>
-              </q-item-section>
-            </q-item>
-          </q-list>
-        </q-btn-dropdown> -->
-        <!-- <div>Quasar v{{ $q.version }}</div> -->
+
       </q-toolbar>
-    </q-header>
+    </q-header> -->
 
     <!-- <q-drawer v-model="leftDrawerOpen" show-if-above bordered> </q-drawer> -->
 
@@ -108,8 +84,8 @@ onMounted(() => {
   }
 });
 
-const onLogout = () => {
-  configuration.setAccountInformation("", "");
-  router.replace({ name: "login" });
-};
+// const onLogout = () => {
+//   configuration.setAccountInformation("", "");
+//   router.replace({ name: "login" });
+// };
 </script>

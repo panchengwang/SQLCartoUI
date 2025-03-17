@@ -1,8 +1,6 @@
 <template>
   <q-page class="full-width full-height bg-blue-3">
-    <div
-      class="absolute row justify-center no-wrap full-width full-height q-gutter-md bg-indigo-1"
-    >
+    <div class="absolute row justify-center no-wrap full-width full-height bg-indigo-1">
       <!-- <div class="col-1"></div>
       <div class="div-with-bg-logo col"></div>
       <div class="div-with-bg-logo col"></div>

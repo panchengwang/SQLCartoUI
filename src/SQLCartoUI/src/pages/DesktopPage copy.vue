@@ -39,8 +39,8 @@
 
 <script setup>
 import { useId } from "quasar";
-import CatalogWindow from "src/components/gis/CatalogWindow.vue";
-import MapEditor from "src/components/gis/MapEditor.vue";
+import CatalogWindow from "src/components/gis/CatalogPanel.vue";
+import MapEditor from "src/components/gis/MapEditorPanel.vue";
 
 import { ref } from "vue";
 

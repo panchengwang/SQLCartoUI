@@ -30,14 +30,15 @@
             @dblclick="toggleMaximize()"
             @mousedown.stop="startDrag"
           >
-            <q-toolbar-title>
+            <q-icon :name="props.icon" size="xs" />
+            <q-toolbar-title style="cursor: default">
               <div class="full-width full-height">
                 {{ props.title }}
               </div>
             </q-toolbar-title>
 
             <div class="q-gutter-sm">
-              <q-btn flat dense size="sm" icon="bi-dash-lg" />
+              <q-btn flat dense size="sm" icon="bi-dash-lg" @click="toggleMinimize" />
               <q-btn
                 flat
                 dense
@@ -58,7 +59,7 @@
             </div>
           </q-toolbar>
         </q-card-section>
-        <q-card-section class="flex-fill-remaining q-pa-none">
+        <q-card-section class="flex-fill-remaining q-pa-none" style="overflow: hidden">
           <slot></slot>
         </q-card-section>
       </q-card>
@@ -86,15 +87,18 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  id: { type: String, default: "id" },
   title: { type: String, default: "Window" },
   container: { type: String, default: "body" },
-  width: { type: Number, default: 450 },
-  height: { type: Number, default: 300 },
+  width: { type: String, default: "450" },
+  height: { type: String, default: "300" },
   minWidth: { type: Number, default: 200 },
   minHeight: { type: Number, default: 200 },
   modal: { type: Boolean, default: false },
+  icon: { type: String, default: "bi-window" },
+  activate: { type: Boolean, default: false },
 });
-const emits = defineEmits(["update:modelValue"]);
+const emits = defineEmits(["update:modelValue", "close", "activate"]);
 
 const resizeHandles = [
   { position: "top", directions: ["n"] },
@@ -113,7 +117,7 @@ const isMaximized = ref(false);
 const isResizing = ref(false);
 const isDragging = ref(false);
 const zIndex = ref(100);
-const size = ref({ width: props.width, height: props.height });
+const size = ref({ width: 0, height: 0 });
 const position = ref({ x: 50, y: 50 });
 const initialValues = ref({ size: null, position: null });
 const containerRect = ref({ left: 0, top: 0, width: 0, height: 0 });
@@ -141,9 +145,22 @@ onMounted(() => {
   containerEl.value.appendChild(dialog.value);
   zIndex.value = containerEl.value.maxZIndex++;
   updateContainerRect();
+
+  size.value = {
+    width: props.width.trim().endsWith("%")
+      ? (containerRect.value.width * parseFloat(props.width.trim().replace("%", ""))) /
+        100.0
+      : parseInt(props.width, 10),
+    height: props.height.trim().endsWith("%")
+      ? (containerRect.value.height * parseFloat(props.height.trim().replace("%", ""))) /
+        100.0
+      : parseInt(props.height, 10),
+  };
   position.value = {
     x: (containerRect.value.width - size.value.width) / 2,
     y: (containerRect.value.height - size.value.height) / 2,
+    // x: Math.random() * (containerRect.value.width / 2.0 - size.value.width),
+    // y: Math.random() * (containerRect.value.height / 2.0 - size.value.height),
   };
   initialValues.value = {
     size: { ...size.value },
@@ -155,26 +172,23 @@ onMounted(() => {
 });
 
 const activate = () => {
-  // console.log(getMaxIndexOfChildren(containerEl.value));
-  if (zIndex.value === containerEl.value.maxZIndex) {
+  if (zIndex.value + 1 === containerEl.value.maxZIndex) {
     return;
   }
   zIndex.value = containerEl.value.maxZIndex++;
+
+  emits("activate", props.id);
 };
 
-// const getMaxIndexOfChildren = (parent) => {
-//   let maxZIndex = 0;
-//   for (let i = 0; i < parent.children.length; i++) {
-//     const child = parent.children[i];
-//     const computedStyle = window.getComputedStyle(child);
-//     const zIndex = parseInt(computedStyle.zIndex, 10);
-
-//     if (!isNaN(zIndex) && zIndex > maxZIndex) {
-//       maxZIndex = zIndex;
-//     }
-//   }
-//   return maxZIndex;
-// };
+watch(
+  () => props.activate,
+  (newVal) => {
+    if (newVal) {
+      activate();
+    }
+    console.log("activate", newVal);
+  }
+);
 
 const toggleMaximize = () => {
   if (isMaximized.value) {
@@ -208,6 +222,11 @@ watch(
   }
 );
 const onClose = () => {
+  emits("update:modelValue", false);
+  emits("close", props.id);
+};
+
+const toggleMinimize = () => {
   emits("update:modelValue", false);
 };
 
@@ -315,8 +334,21 @@ const startDrag = (e) => {
   containerEl.value.addEventListener("mouseup", stopDrag);
 };
 
+// const expose = () => {
+//   return {
+//     modal: () => props.modal,
+//     close: onClose,
+//     hide: onClose,
+//     activate,
+//   };
+// };
+
 defineExpose({
+  modal: () => props.modal,
+  close: onClose,
+  hide: onClose,
   activate,
+  id: props.id,
 });
 </script>
 

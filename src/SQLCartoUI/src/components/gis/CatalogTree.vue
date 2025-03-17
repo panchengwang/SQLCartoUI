@@ -29,23 +29,23 @@
           v-if="['ROOT', 'FOLDER'].includes(prop.node.type)"
         >
           <q-list dense style="width: 200px">
-            <q-item clickable v-close-popup @click="onNewSpatialLayer">
+            <q-item clickable v-close-popup @click="onCreateSpatialLayer">
               <q-item-section side>
                 <q-icon name="fg-layer-alt-add-o" class="text-primary" size="xs" />
               </q-item-section>
-              <q-item-section>New Spatial Layer</q-item-section>
+              <q-item-section>Create Spatial Layer</q-item-section>
             </q-item>
             <q-item clickable v-close-popup>
               <q-item-section side>
                 <q-icon name="bi-table" class="text-primary" size="xs" />
               </q-item-section>
-              <q-item-section>New Table</q-item-section>
+              <q-item-section>Create Table</q-item-section>
             </q-item>
             <q-item clickable v-close-popup>
               <q-item-section side>
                 <q-icon name="bi-folder-plus" class="text-primary" size="xs" />
               </q-item-section>
-              <q-item-section>New Folder</q-item-section>
+              <q-item-section>Create Folder</q-item-section>
             </q-item>
             <q-separator />
             <q-item clickable v-close-popup v-if="prop.node.type === 'FOLDER'">
@@ -115,7 +115,7 @@ const onContextMenu = (event, node) => {
 };
 
 const dialogVisible = ref(false);
-const onNewSpatialLayer = () => {
+const onCreateSpatialLayer = () => {
   dialogVisible.value = true;
 };
 </script>

@@ -244,8 +244,10 @@ const drawDraft = () => {
   }
 
   const ctx = canvas.value.getContext("2d");
-  ctx.clearRect(0, 0, canvas.value.width, canvas.value.height);
-  ctx.drawImage(offscreenCanvas, 0, 0, canvas.value.width, canvas.value.height);
+  if (canvas.value.width > 0 && canvas.value.height > 0) {
+    ctx.clearRect(0, 0, canvas.value.width, canvas.value.height);
+    ctx.drawImage(offscreenCanvas, 0, 0, canvas.value.width, canvas.value.height);
+  }
 };
 
 const drawGeometry = (geo) => {
