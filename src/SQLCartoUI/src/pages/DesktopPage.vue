@@ -12,7 +12,7 @@
             style="width: 67%; min-width: 200px"
           >
             <q-btn
-              v-for="item in appButtons"
+              v-for="item in applications"
               :key="item.id"
               stack
               color="indigo-7 "
@@ -59,7 +59,11 @@
         </div>
       </div>
       <div class="full-width bg-primary">
-        <DesktopDockBar @activate="onActiveWindow"></DesktopDockBar>
+        <DesktopDockBar
+          @activate="onActiveWindow"
+          @start="onStart"
+          :applications="applications"
+        ></DesktopDockBar>
       </div>
     </div>
 
@@ -86,7 +90,7 @@ import CatalogPanel from "src/components/gis/CatalogPanel.vue";
 import { useWindowsManager } from "src/stores/WindowsManager";
 
 const desktopId = useId();
-const appButtons = ref([
+const applications = ref([
   {
     id: "catalog",
     icon: "fas fa-database",
@@ -134,13 +138,10 @@ const setWindows = (el) => {
 };
 
 onMounted(() => {});
+
 const onStart = (id) => {
   let winid = useId().value;
   if (id === "catalog") {
-    // catalogWindowVisible.value = true;
-    // if (catalogWindow.value) {
-    //   catalogWindow.value.activate();
-    // }
     winid = "SQLCarto DB - " + winid;
     winManager.$state.windows.push({
       id: winid,
@@ -190,7 +191,6 @@ const onCloseWindow = (id) => {
       break;
     }
   }
-  console.log("remove dialog", index);
   if (index >= 0) winManager.$state.windows.splice(index, 1);
 };
 

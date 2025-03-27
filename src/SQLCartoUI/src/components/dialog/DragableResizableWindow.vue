@@ -32,20 +32,27 @@
           >
             <q-icon :name="props.icon" size="xs" />
             <q-toolbar-title style="cursor: default">
-              <div class="full-width full-height">
+              <div class="full-width full-height" style="user-select: none">
                 {{ props.title }}
               </div>
             </q-toolbar-title>
 
             <div class="q-gutter-sm">
-              <q-btn flat dense size="sm" icon="bi-dash-lg" @click="toggleMinimize" />
+              <q-btn
+                flat
+                dense
+                size="sm"
+                icon="bi-dash-lg"
+                v-show="props.showMinButton"
+                @click="toggleMinimize"
+              />
               <q-btn
                 flat
                 dense
                 size="sm"
                 icon="bi-fullscreen-exit"
                 @click="toggleMaximize()"
-                v-show="isMaximized"
+                v-show="isMaximized && props.showMaxButton"
               />
               <q-btn
                 flat
@@ -53,7 +60,7 @@
                 size="sm"
                 icon="bi-fullscreen"
                 @click="toggleMaximize()"
-                v-show="!isMaximized"
+                v-show="!isMaximized && props.showMaxButton"
               />
               <q-btn flat dense size="sm" icon="bi-x-lg" @click="onClose" />
             </div>
@@ -61,6 +68,31 @@
         </q-card-section>
         <q-card-section class="flex-fill-remaining q-pa-none" style="overflow: hidden">
           <slot></slot>
+        </q-card-section>
+        <q-card-section v-if="checkButtons">
+          <div
+            style="display: flex; flex-direction: row-reverse"
+            class="q-gutter-md q-pr-md"
+          >
+            <q-btn
+              flat
+              dense
+              size="md"
+              class="primary"
+              label="OK"
+              style="width: 80px"
+              @click="onOk()"
+            ></q-btn>
+            <q-btn
+              dense
+              flat
+              size="md"
+              class="primary"
+              label="Cancel"
+              style="width: 80px"
+              @click="onCancel()"
+            ></q-btn>
+          </div>
         </q-card-section>
       </q-card>
 
@@ -97,8 +129,11 @@ const props = defineProps({
   modal: { type: Boolean, default: false },
   icon: { type: String, default: "bi-window" },
   activate: { type: Boolean, default: false },
+  showMinButton: { type: Boolean, default: true },
+  showMaxButton: { type: Boolean, default: true },
+  checkButtons: { type: Boolean, default: false },
 });
-const emits = defineEmits(["update:modelValue", "close", "activate"]);
+const emits = defineEmits(["update:modelValue", "close", "activate", "ok", "cancel"]);
 
 const resizeHandles = [
   { position: "top", directions: ["n"] },
@@ -342,6 +377,16 @@ const startDrag = (e) => {
 //     activate,
 //   };
 // };
+
+const onOk = () => {
+  emits("ok");
+  onClose();
+};
+
+const onCancel = () => {
+  emits("cancel");
+  onClose();
+};
 
 defineExpose({
   modal: () => props.modal,

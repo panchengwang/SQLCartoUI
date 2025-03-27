@@ -59,17 +59,27 @@
       </template>
     </q-tree>
 
-    <DragableResizableWindow
+    <InputDialog v-if="dialogVisible" v-model="dialogVisible" :modal="true">
+    </InputDialog>
+    <!-- <DragableResizableWindow
+      height="120"
       v-if="dialogVisible"
       v-model="dialogVisible"
       :modal="true"
-    ></DragableResizableWindow>
+    >
+
+      <div class="q-pa-md">
+        <label>Please enter folder name here:</label>
+        <q-input outlined dense></q-input>
+      </div>
+    </DragableResizableWindow> -->
   </div>
 </template>
 
 <script setup>
 import { onMounted, ref } from "vue";
-import DragableResizableWindow from "../dialog/DragableResizableWindow.vue";
+import InputDialog from "../dialog/InputDialog.vue";
+// import DragableResizableWindow from "../dialog/DragableResizableWindow.vue";
 
 const expanded = ref([0]);
 const selected = ref(null);

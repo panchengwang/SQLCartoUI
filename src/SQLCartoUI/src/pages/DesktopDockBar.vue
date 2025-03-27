@@ -1,11 +1,12 @@
 <template>
   <q-toolbar style="min-height: 36px">
-    <q-btn-dropdown
+    <!-- <q-btn-dropdown
       dense
       flat
       color="white"
       :label="configuration.$state.username.trim()"
       icon="account_circle"
+      dropdown-icon=""
       no-caps
       class="no-arrow"
       v-show="
@@ -42,8 +43,67 @@
           />
         </div>
       </div>
-    </q-btn-dropdown>
-    <q-btn flat dense icon="bi-microsoft" class="text-white" @click="onShowDesktop" />
+    </q-btn-dropdown> -->
+    <q-btn flat dense icon="bi-microsoft" class="text-white">
+      <q-menu>
+        <q-list style="min-width: 100px">
+          <q-item
+            dense
+            v-for="app in props.applications"
+            clickable
+            v-close-popup
+            :key="app.id"
+            @click="emits('start', app.id)"
+          >
+            <q-item-section avatar side>
+              <q-avatar size="lg" :icon="app.icon" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>{{ app.label }}</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-separator />
+          <q-item clickable v-ripple @click="onLogout">
+            <q-item-section side avatar>
+              <q-avatar size="lg" color="teal" text-color="white">
+                <img src="/icons/pcwang.png" />
+              </q-avatar>
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Sign Out</q-item-label>
+              <q-item-label caption>
+                {{ configuration.$state.username }}
+              </q-item-label>
+            </q-item-section>
+            <q-item-section side>
+              <q-icon name="logout" />
+            </q-item-section>
+          </q-item>
+          <!-- <div class=" items-center">
+            <q-avatar size="72px">
+              <img src="/icons/pcwang.png" />
+            </q-avatar>
+
+            <div class="text-subtitle1 q-mt-md q-mb-xs">
+              {{ configuration.$state.username.trim() }}
+            </div>
+
+            <q-btn
+              color="primary"
+              label="Sign Out"
+              push
+              size="md"
+              v-close-popup
+              @click="onLogout"
+              no-caps
+            />
+          </div> -->
+        </q-list>
+      </q-menu>
+    </q-btn>
+
+    <q-btn flat dense icon="bi-laptop-fill" class="text-white" @click="onShowDesktop">
+    </q-btn>
     <q-toolbar-title class="row items-center justify-center q-gutter-x-md no-wrap">
       <q-btn
         class="truncate-btn"
@@ -67,21 +127,27 @@
 <script setup>
 import { useConfiguration } from "src/stores/Configuration";
 import { useWindowsManager } from "src/stores/WindowsManager";
-import { useRouter } from "vue-router";
+// import { useRouter } from "vue-router";
 
 const configuration = useConfiguration();
 const winManager = useWindowsManager();
-const router = useRouter();
-const emits = defineEmits(["activate"]);
-
+// const router = useRouter();
+const emits = defineEmits(["activate", "start"]);
+const props = defineProps({
+  applications: {
+    type: Array,
+    default: () => [],
+  },
+});
 const onShowDesktop = () => {
   winManager.$state.windows.forEach((window) => {
     window.visible = false;
   });
 };
 const onLogout = () => {
-  configuration.setAccountInformation("", "");
-  router.replace({ name: "login" });
+  // configuration.setAccountInformation("", "");
+  // router.replace({ name: "login" });
+  window.location.href = "/";
 };
 </script>
 

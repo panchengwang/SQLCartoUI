@@ -63,7 +63,7 @@ const onLogin = () => {
         configuration.$state.nodeUrl = response.data.node_url;
         configuration.$state.token = response.data.token;
         configuration.$state.username = username.value.trim();
-        router.replace({ name: "application" });
+        router.replace({ name: "desktop" });
         configuration.loadWebMapKeys();
       } else {
         $q.notify({
